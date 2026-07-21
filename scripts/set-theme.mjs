@@ -1,4 +1,4 @@
-// Programmatic theme/layout switcher for the running Codex Dream Skin.
+// Programmatic theme/layout switcher for Meteor Skin.
 // The skin intentionally has no on-screen switch UI; agents (or users through
 // their agent) change themes with:
 //

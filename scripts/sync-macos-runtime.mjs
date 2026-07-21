@@ -30,12 +30,11 @@ for (const entry of REQUIRED_ENTRIES) {
 
 const parent = path.dirname(options.destination);
 const privateThemes = path.join(parent, "themes-private");
-const next = `${options.destination}.next-${process.pid}`;
-const previous = `${options.destination}.previous-${process.pid}`;
+const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
+const next = `${options.destination}.next-${stamp}-${process.pid}`;
+const previous = `${options.destination}.backup-${stamp}-${process.pid}`;
 await fs.mkdir(parent, { recursive: true });
 await fs.mkdir(privateThemes, { recursive: true });
-await fs.rm(next, { recursive: true, force: true });
-await fs.rm(previous, { recursive: true, force: true });
 await fs.mkdir(next, { recursive: true });
 
 try {
@@ -68,10 +67,13 @@ try {
     if (existing) await fs.rename(previous, options.destination).catch(() => {});
     throw error;
   }
-  await fs.rm(previous, { recursive: true, force: true });
 } catch (error) {
-  await fs.rm(next, { recursive: true, force: true });
+  console.error(`Runtime staging was kept for inspection: ${next}`);
   throw error;
+}
+
+if (await fs.stat(previous).catch(() => null)) {
+  console.error(`Previous runtime archived for recovery: ${previous}`);
 }
 
 console.log(options.destination);

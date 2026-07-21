@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NODE_BIN="${NODE_BIN:-$(command -v node)}"
-TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/codex-autoskin-test.XXXXXX")"
-trap 'rm -rf "$TMP_ROOT"' EXIT
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/meteor-skin-test.XXXXXX")"
+echo "Test artifacts will be kept at: $TMP_ROOT"
 
 fail() {
   echo "macOS test failed: $*" >&2
@@ -44,11 +44,40 @@ THEME_REPORT="$TMP_ROOT/themes.json"
 "$NODE_BIN" "$ROOT/scripts/injector.mjs" --themes >"$THEME_REPORT"
 "$NODE_BIN" -e '
   const report = require(process.argv[1]);
-  if (report.defaultTheme !== "aurora-veil") throw new Error("unexpected default theme");
+  if (!report.themes.some((theme) => theme.name === report.defaultTheme)) throw new Error("default theme is not loadable");
   for (const name of ["aurora-veil", "ember-bloom"]) {
     if (!report.themes.some((theme) => theme.name === name)) throw new Error(`missing ${name}`);
   }
 ' "$THEME_REPORT"
+
+echo "Checking adaptive theme schema in an isolated fixture..."
+ADAPTIVE_ROOT="$TMP_ROOT/adaptive-skill"
+cp -R "$ROOT" "$ADAPTIVE_ROOT"
+mkdir -p "$ADAPTIVE_ROOT/themes-private/ci-adaptive"
+cp "$ROOT/themes/aurora-veil/art.png" "$ADAPTIVE_ROOT/themes-private/ci-adaptive/art.png"
+"$NODE_BIN" -e '
+  const fs = require("fs");
+  const path = require("path");
+  const [source, output] = process.argv.slice(1);
+  const theme = JSON.parse(fs.readFileSync(source, "utf8"));
+  theme.name = "ci-adaptive";
+  theme.order = 1;
+  theme.default = true;
+  theme.meta = { button: "CI", brand: "CI adaptive", edition: "test", signature: "CI" };
+  theme.modes = {
+    light: { tokens: { "--dream-native-text-primary": "#102030" } },
+    dark: { tokens: { "--dream-native-text-primary": "#e6f2ff" } }
+  };
+  fs.writeFileSync(output, `${JSON.stringify(theme, null, 2)}\n`);
+' "$ROOT/themes/aurora-veil/theme.json" "$ADAPTIVE_ROOT/themes-private/ci-adaptive/theme.json"
+ADAPTIVE_REPORT="$TMP_ROOT/adaptive-themes.json"
+"$NODE_BIN" "$ADAPTIVE_ROOT/scripts/injector.mjs" --themes >"$ADAPTIVE_REPORT"
+"$NODE_BIN" -e '
+  const report = require(process.argv[1]);
+  const adaptive = report.themes.find((theme) => theme.name === "ci-adaptive");
+  if (report.defaultTheme !== "ci-adaptive") throw new Error("adaptive fixture was not selected as default");
+  if (adaptive?.appearance !== "adaptive") throw new Error("adaptive theme was not reported correctly");
+' "$ADAPTIVE_REPORT"
 
 echo "Checking base-color apply/restore idempotence..."
 CONFIG_PATH="$TMP_ROOT/config.toml"
@@ -81,7 +110,8 @@ for entry in scripts assets styles themes .runtime.json; do
   [ -e "$RUNTIME_ROOT/$entry" ] || fail "runtime is missing $entry"
 done
 [ -L "$RUNTIME_ROOT/themes-private" ] || fail "runtime private themes are not linked to durable storage"
-[ -x "$RUNTIME_ROOT/scripts/autoskin-macos.sh" ] || fail "runtime scripts lost executable permissions"
+[ -x "$RUNTIME_ROOT/scripts/meteor-skin-macos.sh" ] || fail "primary runtime entry lost executable permissions"
+[ -x "$RUNTIME_ROOT/scripts/autoskin-macos.sh" ] || fail "legacy runtime wrapper is missing"
 "$NODE_BIN" "$ROOT/scripts/sync-macos-runtime.mjs" \
   --source "$ROOT" --destination "$RUNTIME_ROOT" >/dev/null
 "$NODE_BIN" "$RUNTIME_ROOT/scripts/injector.mjs" --themes >/dev/null
@@ -183,10 +213,10 @@ HOME="$TEST_HOME" /bin/bash -c '
 echo "Checking isolated one-command installation..."
 mkdir -p "$TEST_HOME/.codex"
 printf '%s\n' '[desktop]' 'appearanceTheme = "dark"' >"$TEST_HOME/.codex/config.toml"
-HOME="$TEST_HOME" "$ROOT/scripts/autoskin-macos.sh" install \
+HOME="$TEST_HOME" "$ROOT/scripts/meteor-skin-macos.sh" install \
   --no-start --no-auto-recover --port 19337 --app "$FAKE_APP" --node "$NODE_BIN" >/dev/null
 INSTALLED_ROOT="$TEST_HOME/Library/Application Support/CodexDreamSkin"
-[ -x "$INSTALLED_ROOT/runtime/scripts/autoskin-macos.sh" ] || fail "unified installer did not create a stable runtime"
+[ -x "$INSTALLED_ROOT/runtime/scripts/meteor-skin-macos.sh" ] || fail "unified installer did not create a stable runtime"
 [ -f "$INSTALLED_ROOT/config.before-dream-skin.toml" ] || fail "unified installer did not back up base colors"
 [ ! -e "$TEST_HOME/Library/LaunchAgents/com.codex-autoskin.watcher.plist" ] || fail "--no-auto-recover installed a LaunchAgent"
 HOME="$TEST_HOME" /bin/bash -c '
@@ -194,7 +224,7 @@ HOME="$TEST_HOME" /bin/bash -c '
   . "$1/runtime/scripts/lib/mac-common.sh"
   [ "$(dream_installed_port)" = "19337" ]
 ' test "$INSTALLED_ROOT"
-HOME="$TEST_HOME" "$INSTALLED_ROOT/runtime/scripts/autoskin-macos.sh" quick-theme \
+HOME="$TEST_HOME" "$INSTALLED_ROOT/runtime/scripts/meteor-skin-macos.sh" quick-theme \
   "$ROOT/themes/aurora-veil/art.png" --name installed-quick-theme --no-apply --node "$NODE_BIN" >/dev/null
 [ -f "$INSTALLED_ROOT/themes-private/installed-quick-theme/theme.json" ] || fail "installed quick-theme did not persist its theme"
 "$NODE_BIN" "$INSTALLED_ROOT/runtime/scripts/injector.mjs" --themes >"$TMP_ROOT/installed-themes.json"
@@ -213,5 +243,10 @@ for _ in 1 2; do
 done
 [ ! -e "$TEST_HOME/Library/Application Support/CodexDreamSkin/runtime" ] || fail "runtime was not removed"
 [ ! -e "$TEST_HOME/Library/Application Support/CodexDreamSkin/install-state.json" ] || fail "install state was not removed"
+
+echo "Checking portable package staging and checksums..."
+PACKAGE_ROOT="$TMP_ROOT/Portable Package 中文路径"
+"$NODE_BIN" "$ROOT/scripts/build-share-package.mjs" --output "$PACKAGE_ROOT" >/dev/null
+"$NODE_BIN" "$ROOT/scripts/verify-share-package.mjs" --package "$PACKAGE_ROOT" >/dev/null
 
 echo "All macOS tests passed."

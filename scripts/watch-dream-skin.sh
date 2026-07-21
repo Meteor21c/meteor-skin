@@ -11,6 +11,8 @@ LAUNCH_GRACE_SECONDS=15
 MAX_CONSECUTIVE_FAILURES=3
 COOLDOWN_MINUTES=30
 PROBE_FAILURES_BEFORE_RECOVERY=3
+# Kept as accepted legacy options below so older LaunchAgents do not fail, but
+# background watchers never restart the app. Only the interactive activator may.
 MAX_RESTARTS_PER_WINDOW=2
 RESTART_WINDOW_MINUTES=10
 APP_PATH=""
@@ -57,7 +59,7 @@ if ! mkdir "$LOCK_DIR" 2>/dev/null; then
   if [ -n "$OLD_WATCHER_PID" ] && dream_pid_matches "$OLD_WATCHER_PID" "watch-dream-skin.sh"; then
     exit 0
   fi
-  rm -rf "$LOCK_DIR"
+  rmdir "$LOCK_DIR" 2>/dev/null || true
   mkdir "$LOCK_DIR" || exit 1
 fi
 
@@ -68,7 +70,7 @@ cleanup() {
   fi
   CURRENT_PID="$(dream_read_json_number "$WATCHER_STATE_PATH" watcherPid 2>/dev/null || true)"
   if [ "$CURRENT_PID" = "$$" ]; then rm -f "$WATCHER_STATE_PATH"; fi
-  rm -rf "$LOCK_DIR"
+  rmdir "$LOCK_DIR" 2>/dev/null || true
   write_log "Watcher stopped (PID $$)."
 }
 trap cleanup EXIT
@@ -101,7 +103,6 @@ CONSECUTIVE_FAILURES=0
 SUSPENDED_UNTIL=0
 MISSED_PROBES=0
 APP_FIRST_SEEN=0
-RESTART_TIMES=""
 
 while :; do
   NOW="$(date +%s)"
@@ -110,7 +111,7 @@ while :; do
 
   if [ "$DEBUG_READY" -eq 1 ] && injector_healthy; then
     if [ "$CONSECUTIVE_FAILURES" -gt 0 ] || [ "$SUSPENDED_UNTIL" -gt 0 ]; then
-      write_log "Dream Skin is healthy again; resuming normal watch."
+      write_log "Meteor Skin is healthy again; resuming normal watch."
     fi
     CONSECUTIVE_FAILURES=0
     SUSPENDED_UNTIL=0
@@ -170,35 +171,13 @@ while :; do
     fi
     MISSED_PROBES=0
 
-    WINDOW_START=$((NOW - RESTART_WINDOW_MINUTES * 60))
-    FILTERED=""
-    RESTART_COUNT=0
-    for timestamp in $RESTART_TIMES; do
-      if [ "$timestamp" -ge "$WINDOW_START" ]; then
-        FILTERED="$FILTERED $timestamp"
-        RESTART_COUNT=$((RESTART_COUNT + 1))
-      fi
-    done
-    RESTART_TIMES="$FILTERED"
-    if [ "$RESTART_COUNT" -ge "$MAX_RESTARTS_PER_WINDOW" ]; then
-      SUSPENDED_UNTIL=$((NOW + COOLDOWN_MINUTES * 60))
-      write_log "Restart rate limit hit ($RESTART_COUNT restarts within $RESTART_WINDOW_MINUTES minutes); auto-recovery suspended for $COOLDOWN_MINUTES minutes. Codex keeps running unskinned."
-      sleep "$POLL_SECONDS"
-      continue
-    fi
-
-    write_log "Detected Codex launched without Dream Skin; restarting it through the skin launcher."
-    RESTART_TIMES="$RESTART_TIMES $NOW"
-    if ! run_start --port "$PORT" --restart-existing --node "$NODE_BIN" --app "$APP_BUNDLE"; then
-      FAILED=1
-      FAILURE_REASON="launcher failed"
-    elif ! dream_cdp_ready "$PORT"; then
-      FAILED=1
-      FAILURE_REASON="launcher finished but CDP is unreachable on both loopbacks"
-    else
-      write_log "Codex restarted with Dream Skin."
-      APP_FIRST_SEEN="$(date +%s)"
-    fi
+    # Electron cannot gain a remote-debugging port in-place. A background
+    # watcher must never terminate the user's running Codex. The interactive
+    # activator asks for consent before a restart when activation needs one.
+    SUSPENDED_UNTIL=$((NOW + COOLDOWN_MINUTES * 60))
+    write_log "Codex is running without the Meteor Skin debug port. No restart was attempted. Use the Start Meteor Skin entry to activate it; watcher checks resume in $COOLDOWN_MINUTES minutes."
+    sleep "$POLL_SECONDS"
+    continue
   fi
 
   if [ "$FAILED" -eq 1 ]; then

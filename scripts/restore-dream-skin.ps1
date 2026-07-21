@@ -6,7 +6,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$node = (Get-Command node -ErrorAction Stop).Source
+. (Join-Path $PSScriptRoot 'lib\windows-common.ps1')
+$node = Get-DreamNodePath
 $injector = Join-Path $PSScriptRoot 'injector.mjs'
 $StateRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin'
 $StatePath = Join-Path $StateRoot 'state.json'
@@ -33,38 +34,32 @@ try { & $node $injector --remove --port $Port --timeout-ms 3000 } catch {}
 if ($Uninstall) {
   $desktop = [Environment]::GetFolderPath('Desktop')
   $startMenu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
-  @(
-    (Join-Path $desktop 'Codex Dream Skin.lnk'),
-    (Join-Path $desktop 'Codex Dream Skin - Restore.lnk'),
-    (Join-Path $startMenu 'Codex Dream Skin.lnk'),
-    (Join-Path ([Environment]::GetFolderPath('Startup')) 'Codex Dream Skin Watcher.lnk')
-  ) | ForEach-Object { Remove-Item -LiteralPath $_ -Force -ErrorAction SilentlyContinue }
+  $desktopStart = Join-Path $desktop 'Meteor Skin.lnk'
+  $desktopRestore = Join-Path $desktop 'Meteor Skin - Restore.lnk'
+  $menuStart = Join-Path $startMenu 'Meteor Skin.lnk'
+  $startupWatcher = Join-Path ([Environment]::GetFolderPath('Startup')) 'Meteor Skin Watcher.lnk'
+  $legacyDesktopStart = Join-Path $desktop 'Codex Dream Skin.lnk'
+  $legacyDesktopRestore = Join-Path $desktop 'Codex Dream Skin - Restore.lnk'
+  $legacyMenuStart = Join-Path $startMenu 'Codex Dream Skin.lnk'
+  $legacyStartupWatcher = Join-Path ([Environment]::GetFolderPath('Startup')) 'Codex Dream Skin Watcher.lnk'
+  Remove-Item -LiteralPath $desktopStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $desktopRestore -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $menuStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $startupWatcher -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyDesktopStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyDesktopRestore -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyMenuStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyStartupWatcher -Force -ErrorAction SilentlyContinue
 }
 
 if ($RestoreBaseTheme) {
   $backup = Join-Path $StateRoot 'config.before-dream-skin.toml'
   $config = Join-Path $HOME '.codex\config.toml'
-  if (-not (Test-Path -LiteralPath $backup)) { throw 'No pre-install config backup is available.' }
-  $backupContent = Get-Content -LiteralPath $backup -Raw
-  $currentContent = Get-Content -LiteralPath $config -Raw
-  foreach ($key in @('appearanceTheme', 'appearanceLightCodeThemeId', 'appearanceLightChromeTheme')) {
-    $pattern = "(?m)^$([regex]::Escape($key))\s*=.*(?:\r?\n)?"
-    $saved = [regex]::Match($backupContent, $pattern)
-    if ([regex]::IsMatch($currentContent, $pattern)) {
-      $replacement = if ($saved.Success) { $saved.Value.TrimEnd("`r", "`n") + "`r`n" } else { '' }
-      $currentContent = [regex]::Replace($currentContent, $pattern, $replacement, 1)
-    } elseif ($saved.Success) {
-      $desktop = [regex]::Match($currentContent, '(?ms)^\[desktop\]\s*\r?\n(?<body>.*?)(?=^\[|\z)')
-      if (-not $desktop.Success) {
-        $currentContent = $currentContent.TrimEnd() + "`r`n`r`n[desktop]`r`n"
-        $desktop = [regex]::Match($currentContent, '(?ms)^\[desktop\]\s*\r?\n(?<body>.*?)(?=^\[|\z)')
-      }
-      $body = $desktop.Groups['body'].Value.TrimEnd() + "`r`n" + $saved.Value.TrimEnd("`r", "`n") + "`r`n"
-      $currentContent = $currentContent.Substring(0, $desktop.Groups['body'].Index) + $body +
-        $currentContent.Substring($desktop.Groups['body'].Index + $desktop.Groups['body'].Length)
-    }
+  if (Test-Path -LiteralPath $backup) {
+    & $node (Join-Path $PSScriptRoot 'configure-base-theme.mjs') --config $config --backup $backup --restore | Out-Null
+  } else {
+    Write-Host 'No pre-install appearance backup was found; there is nothing to restore.'
   }
-  Set-Content -LiteralPath $config -Value $currentContent -Encoding utf8
 }
 
 Write-Host 'The live Dream Skin was removed.'

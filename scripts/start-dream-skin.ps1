@@ -7,6 +7,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'lib\windows-common.ps1')
 $SkillRoot = Split-Path -Parent $PSScriptRoot
 $Injector = Join-Path $PSScriptRoot 'injector.mjs'
 $StateRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin'
@@ -45,7 +46,7 @@ function Stop-CodexCompletely {
   Start-Sleep -Milliseconds 300
 }
 
-$node = (Get-Command node -ErrorAction Stop).Source
+$node = Get-DreamNodePath
 $debugReady = Test-CodexDebugPort $Port
 $mainProcesses = @(Get-Process ChatGPT -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 })
 
@@ -57,8 +58,7 @@ if (-not $debugReady -and -not $ProfilePath -and $mainProcesses.Count -gt 0) {
 }
 
 function Start-CodexWithDebugPort {
-  $package = Get-AppxPackage OpenAI.Codex | Sort-Object Version -Descending | Select-Object -First 1
-  if (-not $package) { throw 'The OpenAI.Codex Store package is not installed.' }
+  $package = Get-DreamCodexPackage
   $exe = Join-Path $package.InstallLocation 'app\ChatGPT.exe'
   if (-not (Test-Path -LiteralPath $exe)) { throw "Codex executable not found: $exe" }
   $arguments = @("--remote-debugging-port=$Port")
@@ -121,4 +121,4 @@ for ($attempt = 0; $attempt -lt 45; $attempt++) {
   if ($LASTEXITCODE -eq 0) { $verified = $true; break }
 }
 if (-not $verified) { throw 'Dream skin launched but verification failed. See injector logs.' }
-Write-Host "Codex Dream Skin is active on port $Port."
+Write-Host "Meteor Skin is active on port $Port."

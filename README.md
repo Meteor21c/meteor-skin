@@ -1,13 +1,13 @@
 <div align="center">
 
-# Codex AutoSkin
+# Meteor Skin
 
 **Send one image — your Codex reskins itself.**
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078d4)
 ![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933)
-![Release](https://img.shields.io/github/v/release/Finderchangchang/codex-autoskin)
+![Version](https://img.shields.io/badge/version-2.3.0-7c3aed)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 Two minutes to first light · No official files touched · One-command restore · Windows & macOS
@@ -19,6 +19,12 @@ Two minutes to first light · No official files touched · One-command restore �
 </div>
 
 ---
+
+> **Derivative fork notice:** this public fork is maintained by
+> [@Meteor21c](https://github.com/Meteor21c) and preserves the original
+> [Finderchangchang/codex-autoskin](https://github.com/Finderchangchang/codex-autoskin)
+> history and MIT attribution. See [NOTICE.md](NOTICE.md) for the complete
+> provenance, modification, AI-assistance, asset-rights, and trademark notice.
 
 ## 🎬 Live demo
 
@@ -43,7 +49,7 @@ Done — from a single image to a custom skin, hands-free:
 Send this line to your Codex, with an image you like attached (landscape, subject on the right, no text/watermark):
 
 ```text
-Install this Codex skin engine: https://github.com/Finderchangchang/codex-autoskin , then use the attached image to generate a theme and apply it
+Install Meteor Skin from https://github.com/Meteor21c/meteor-skin, then use the attached image to generate and apply a theme
 ```
 
 The rest is automatic. No image? It still lights up with a bundled theme first — add yours anytime. Don't want to use AI? See the manual per-platform steps below.
@@ -72,17 +78,17 @@ The rest is automatic. No image? It still lights up with a bundled theme first �
 - 📁 **A theme is a folder** — one `theme.json` + one image is a theme; add or remove themes with zero code changes
 - 🤖 **Optional AI refinement** — hand the repo to your Codex / Claude and deeply customize crop, copy, and stickers via [THEME-SPEC.md](THEME-SPEC.md)
 - 🔒 **Safe & reversible** — CDP injection on loopback only; never touches `WindowsApps`, the app bundle, or `app.asar`; login/session preserved; one command to restore
-- 🛡 **Battle-tested guard** — dual-stack port probing, crash debounce + circuit breaker, decoration hit-testing; a Startup watcher on Windows / a LaunchAgent on macOS re-applies the skin after Codex restarts
+- 🛡 **Consent-first guard** — dual-stack probing, debounce, circuit breaker, and decoration hit-testing; the Windows Startup watcher / macOS LaunchAgent repairs the injector when CDP is already available and never restarts Codex without consent
 
 ## 🚀 Quick start
 
 ### Windows: two commands
 
-Requires Windows 10/11, Microsoft Store Codex (opened and signed in once), and [Node.js ≥ 20](https://nodejs.org/).
+Requires Windows 10/11 and Microsoft Store Codex (opened and signed in once). The installer prefers a compatible Node.js runtime bundled with Codex and otherwise uses a system [Node.js ≥ 20](https://nodejs.org/).
 
 ```powershell
-git clone https://github.com/Finderchangchang/codex-autoskin.git   # or Download ZIP and extract
-cd codex-autoskin
+git clone https://github.com/Meteor21c/meteor-skin.git   # or Download ZIP and extract
+cd meteor-skin
 
 .\quickstart.ps1                              # ① install & launch — Codex lights up with a bundled theme
 .\quick-theme.ps1 -Image C:\path\your.png     # ② your image becomes a live theme
@@ -94,15 +100,15 @@ Don't like the palette? Swap the image and rerun. `-Name yourname` names the the
 
 Requires the official Codex Mac app (opened and signed in once). **No Node.js install needed** — the scripts reuse the runtime bundled with Codex.
 
-1. **Download & extract** — GitHub → Code → Download ZIP, then open the `codex-autoskin` folder in Finder;
-2. **Double-click to install** — open `Install AutoSkin on macOS.command` (it asks before restarting a running Codex);
-3. **Pick an image** — open `Create AutoSkin Theme on macOS.command`, choose a PNG/JPG (or drag one onto the file); it auto-extracts colors, generates, and applies.
+1. **Download & extract** — GitHub → Code → Download ZIP, then open the `meteor-skin` folder in Finder;
+2. **Double-click to install** — open `Install Meteor Skin on macOS.command` (it asks before restarting a running Codex);
+3. **Pick an image** — open `Create Meteor Skin Theme on macOS.command`, choose a PNG/JPG (or drag one onto the file); it auto-extracts colors, generates, and applies.
 
 A normal install uses your existing Codex profile — **it does not wipe projects, tasks, chats, or login**. Gatekeeper blocking a script? See [FAQ](#-faq). Terminal equivalents:
 
 ```bash
-scripts/autoskin-macos.sh install
-scripts/autoskin-macos.sh quick-theme "/path/to/your.png" --name my-theme
+scripts/meteor-skin-macos.sh install
+scripts/meteor-skin-macos.sh quick-theme "/path/to/your.png" --name my-theme
 ```
 
 **Image requirements (both platforms)**: PNG / JPG, landscape ≥ 1600 px wide, subject toward the right (the left carries the title), no text / watermark / UI in the art, and you own the rights to it.
@@ -125,19 +131,19 @@ scripts/autoskin-macos.sh quick-theme "/path/to/your.png" --name my-theme
 Installation atomically syncs a self-contained runtime to `~/Library/Application Support/CodexDreamSkin/runtime`; personal themes live next to it in `themes-private` (runtime updates never overwrite them). After deleting the downloaded repo you can still use the stable entry point:
 
 ```bash
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" start
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" start
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
 ```
 
 Common commands (a custom port / app path chosen at install time is remembered):
 
 ```bash
-scripts/autoskin-macos.sh doctor                                  # health check: app, bundled Node, state dir, CDP port
-scripts/autoskin-macos.sh theme ember-bloom fullscreen            # switch theme
-scripts/autoskin-macos.sh verify --screenshot "$PWD/shot.png"     # verify + screenshot by native window id
-scripts/autoskin-macos.sh uninstall                               # full uninstall (safe to repeat)
+scripts/meteor-skin-macos.sh doctor                                  # health check: app, bundled Node, state dir, CDP port
+scripts/meteor-skin-macos.sh theme ember-bloom fullscreen            # switch theme
+scripts/meteor-skin-macos.sh verify --screenshot "$PWD/shot.png"     # verify + screenshot by native window id
+scripts/meteor-skin-macos.sh uninstall                               # full uninstall (safe to repeat)
 scripts/install-dream-skin.sh --app "$HOME/Apps/ChatGPT.app"      # non-standard install location
-scripts/autoskin-macos.sh install --port 19335                    # if the port is taken, set it once
+scripts/meteor-skin-macos.sh install --port 19335                    # if the port is taken, set it once
 ```
 
 Troubleshooting logs live in `~/Library/Application Support/CodexDreamSkin/`: `injector-error.log` (theme scan/injection), `watcher.log` (auto-recovery / breaker), `launch-agent-error.log` (LaunchAgent).
@@ -153,7 +159,7 @@ scripts\restore-dream-skin.ps1                     # Windows: restore the offici
 ```
 
 ```bash
-scripts/autoskin-macos.sh theme aurora-veil fullscreen   # macOS: switch theme
+scripts/meteor-skin-macos.sh theme aurora-veil fullscreen   # macOS: switch theme
 scripts/restore-dream-skin.sh                            # macOS: restore the official look
 ```
 
@@ -174,7 +180,7 @@ It launches the official Codex (`ChatGPT.exe` on Windows / `ChatGPT.app` on macO
 - Never replaces, patches, or re-signs any official file or app bundle; login / session / plugins stay untouched
 - The platform `restore-dream-skin` script removes all injected content live; for a full uninstall add `-Uninstall -RestoreBaseTheme` (Windows) or `--uninstall --restore-base-theme` (macOS, safe to repeat)
 - All runtime state lives under `%LOCALAPPDATA%\CodexDreamSkin` / `~/Library/Application Support/CodexDreamSkin`; delete it and no trace remains
-- A hidden watcher re-applies the skin after a normal Codex restart (debounce + rate limit + failure cooldown, never fighting the app); the macOS LaunchAgent never interrupts a Codex that was already open
+- A hidden watcher repairs a missing injector only when Codex already exposes CDP; it never closes or restarts an open app. The activation entry asks before the one restart required for an unskinned running instance
 - Auxiliary renderers (desktop pets, etc.) are never injected and stay transparent
 
 > The scripts and internal identifiers keep the `dream` prefix — that's the default style-pack name, and a nod to the original.
@@ -195,16 +201,16 @@ It launches the official Codex (`ChatGPT.exe` on Windows / `ChatGPT.app` on macO
 Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`; for a ZIP download also run `Get-ChildItem -Recurse | Unblock-File`.
 
 **macOS says "developer cannot be verified"?**
-Right-click the `.command` file → **Open**, then confirm once. No execute permission? Run `chmod +x ./*.command ./scripts/*.sh` in the repo folder. Still blocked by download quarantine and sure it's from this repo? `xattr -dr com.apple.quarantine "/path/to/codex-autoskin"`.
+Right-click the `.command` file → **Open**, then confirm once. No execute permission? Run `chmod +x ./*.command ./scripts/*.sh` in the repo folder. Still blocked by download quarantine and sure it's from this repo? `xattr -dr com.apple.quarantine "/path/to/meteor-skin"`.
 
 **macOS screenshot verification fails?**
 Grant Screen Recording permission to the terminal (or agent) running the command, then retry — macOS captures by native window id, so it's correct even when another window overlaps.
 
 **The skin vanished after a Codex update?**
-Windows: rerun `.\quickstart.ps1`. macOS: rerun `scripts/autoskin-macos.sh install`. Both rediscover the current app dynamically and store no versioned path.
+Windows: rerun `.\quickstart.ps1`. macOS: rerun `scripts/meteor-skin-macos.sh install`. Both rediscover the current app dynamically and store no versioned path.
 
 **Port 9335 is taken?**
-Windows: `.\quickstart.ps1 -Port 9345`, keep the same port for later scripts. macOS: `scripts/autoskin-macos.sh install --port 19335`, later unified commands remember it.
+Windows: `.\quickstart.ps1 -Port 9345`, keep the same port for later scripts. macOS: `scripts/meteor-skin-macos.sh install --port 19335`, later unified commands remember it.
 
 **Will it affect my Codex account or data?**
 No. It never modifies official files, never touches login or sessions, and injection happens on loopback only. It is a decorative community project — see [Disclaimer](#%EF%B8%8F-disclaimer).
@@ -213,7 +219,7 @@ No. It never modifies official files, never touches login or sessions, and injec
 It's a pure CSS/JS decoration layer plus a lightweight guard process — imperceptible in normal use.
 
 **How do I fully uninstall?**
-Windows: `scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`. macOS: `scripts/autoskin-macos.sh uninstall`. Then launch Codex normally for the pure official state.
+Windows: `scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`. macOS: `scripts/meteor-skin-macos.sh uninstall`. Then launch Codex normally for the pure official state.
 
 **Which platforms are supported?**
 Windows (Store Codex) and macOS (official desktop app). Linux is not supported yet — PRs welcome.
@@ -224,16 +230,16 @@ Three kinds of contributions are most welcome: **new themes** (PR a `themes/` fo
 
 ## 💬 About
 
-The original idea of skinning Codex through CDP injection — then called **Dream Skin** — is mine, and it's been a joy to watch it spread through the community. AutoSkin is a full rewrite: v1 answered "can Codex be skinned?"; this one answers "how does anyone get their own skin from a single image?"
+Upstream history: the original CDP-based skinning project was called **Dream Skin**, then fully rewritten upstream as **AutoSkin**. Meteor Skin is an independently maintained derivative that preserves that history and attribution.
 
 The whole 2.0 was pair-programmed with AI — the full decision log, including every faceplant, is public in [DEVLOG.md](DEVLOG.md), a transparent cyber-development experiment that keeps updating. macOS support was contributed by [@keyuchen21](https://github.com/keyuchen21), landing the day after launch — open source working as intended.
 
 ## ⚠️ Disclaimer
 
-- A decorative community project, **not affiliated with OpenAI**; Codex and related marks belong to their respective owners.
+- A decorative community project, **not affiliated with or endorsed by OpenAI**; Codex and related marks belong to their respective owners and must be used under the current [OpenAI brand guidelines](https://openai.com/brand/).
 - Codex desktop updates may change internal structure and require re-adaptation (the engine targets semantic selectors, so minor updates are usually seamless).
 - You are responsible for the copyright and likeness rights of art in your own themes; never use another person's likeness to build and publicly distribute a theme — keep private themes in the git-ignored `themes-private/`.
 
 ## 📄 License
 
-[MIT](LICENSE) © Vikicc
+[MIT](LICENSE) © 2026 Vikicc for the upstream work. Modifications are maintained by [@Meteor21c](https://github.com/Meteor21c) under the same license to the extent applicable. See [NOTICE.md](NOTICE.md) for complete attribution and licensing boundaries.

@@ -42,7 +42,7 @@ if [ -f "$WATCHER_STATE_PATH" ]; then
   [ -z "$WATCHER_PID" ] || dream_stop_pid_if_matches "$WATCHER_PID" "watch-dream-skin.sh"
 fi
 rm -f "$WATCHER_STATE_PATH"
-rm -rf "$STATE_ROOT/watcher.lock"
+rmdir "$STATE_ROOT/watcher.lock" 2>/dev/null || true
 INJECTOR_STATE_PATH="$STATE_ROOT/state.json"
 if [ -f "$INJECTOR_STATE_PATH" ]; then
   INJECTOR_PID="$(dream_read_json_number "$INJECTOR_STATE_PATH" injectorPid 2>/dev/null || true)"
@@ -56,6 +56,9 @@ RUNTIME_SCRIPTS="$RUNTIME_ROOT/scripts"
 
 "$NODE_BIN" "$RUNTIME_SCRIPTS/configure-base-theme.mjs" \
   --config "$CONFIG_PATH" --backup "$BACKUP_PATH" --platform darwin
+
+"$NODE_BIN" "$RUNTIME_SCRIPTS/create-macos-entrypoints.mjs" \
+  --desktop "$HOME/Desktop" --runtime "$RUNTIME_ROOT" >/dev/null
 
 if [ "$NO_AUTO_RECOVER" -ne 1 ]; then
   "$NODE_BIN" "$RUNTIME_SCRIPTS/macos-launch-agent.mjs" \
@@ -82,6 +85,6 @@ fi
   }, null, 2) + "\n");
 ' "$INSTALL_STATE_PATH" "$PORT" "$APP_BUNDLE" "$NODE_BIN" "$RUNTIME_ROOT" "$SOURCE_ROOT"
 
-echo "Codex Dream Skin installed for macOS."
+echo "Meteor Skin installed for macOS."
 echo "Installed runtime: $RUNTIME_ROOT"
-echo "Launch it with: $RUNTIME_SCRIPTS/autoskin-macos.sh start"
+echo "Launch it with: $RUNTIME_SCRIPTS/meteor-skin-macos.sh start"

@@ -151,4 +151,4 @@ if [ "$VERIFIED" -ne 1 ]; then
   dream_die "Dream Skin launched but verification failed; see $STDERR_PATH"
 fi
 START_SUCCEEDED=1
-echo "Codex Dream Skin is active on port $PORT."
+echo "Meteor Skin is active on port $PORT."

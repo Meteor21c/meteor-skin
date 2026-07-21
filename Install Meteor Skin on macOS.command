@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-"$ROOT/scripts/autoskin-macos.sh" install
+"$ROOT/scripts/meteor-skin-macos.sh" install
 STATUS=$?
 
 echo

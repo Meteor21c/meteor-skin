@@ -4,14 +4,14 @@ ROOT="$(cd "$(dirname "$0")" && pwd)"
 IMAGE_PATH="${1:-}"
 
 if [ -z "$IMAGE_PATH" ]; then
-  IMAGE_PATH="$(/usr/bin/osascript -e 'POSIX path of (choose file with prompt "选择一张 PNG 或 JPG 图片来生成 AutoSkin 主题")' 2>/dev/null)"
+  IMAGE_PATH="$(/usr/bin/osascript -e 'POSIX path of (choose file with prompt "选择一张 PNG 或 JPG 图片来生成 Meteor Skin 主题")' 2>/dev/null)"
   if [ -z "$IMAGE_PATH" ]; then
     echo "没有选择图片。"
     exit 0
   fi
 fi
 
-"$ROOT/scripts/autoskin-macos.sh" quick-theme "$IMAGE_PATH"
+"$ROOT/scripts/meteor-skin-macos.sh" quick-theme "$IMAGE_PATH"
 STATUS=$?
 
 echo

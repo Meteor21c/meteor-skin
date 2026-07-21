@@ -51,7 +51,7 @@ THEMES_ROOT="$PROJECT_ROOT/themes-private"
 RESERVED_ROOT="$PROJECT_ROOT/themes"
 
 if [ -f "$RUNTIME_ROOT/scripts/injector.mjs" ]; then
-  [ -e "$RUNTIME_ROOT/themes-private" ] || dream_die "installed runtime is from an older version; rerun '$PROJECT_ROOT/scripts/autoskin-macos.sh install --no-start' first"
+  [ -e "$RUNTIME_ROOT/themes-private" ] || dream_die "installed runtime is from an older version; rerun '$PROJECT_ROOT/scripts/meteor-skin-macos.sh install --no-start' first"
   ACTIVE_ROOT="$RUNTIME_ROOT"
   THEMES_ROOT="$STATE_ROOT/themes-private"
   RESERVED_ROOT="$RUNTIME_ROOT/themes"
@@ -83,12 +83,12 @@ fi
 
 if ! dream_cdp_ready "$PORT"; then
   echo ""
-  echo "主题已生成，但当前 Codex 没有运行 AutoSkin。"
-  if [ -f "$RUNTIME_ROOT/scripts/autoskin-macos.sh" ]; then
-    echo "启动后应用：$RUNTIME_ROOT/scripts/autoskin-macos.sh start"
-    echo "然后运行：$RUNTIME_ROOT/scripts/autoskin-macos.sh theme $THEME_NAME $LAYOUT"
+  echo "主题已生成，但当前 Codex 没有运行 Meteor Skin。"
+  if [ -f "$RUNTIME_ROOT/scripts/meteor-skin-macos.sh" ]; then
+    echo "启动后应用：$RUNTIME_ROOT/scripts/meteor-skin-macos.sh start"
+    echo "然后运行：$RUNTIME_ROOT/scripts/meteor-skin-macos.sh theme $THEME_NAME $LAYOUT"
   else
-    echo "先运行：$PROJECT_ROOT/scripts/autoskin-macos.sh install"
+    echo "先运行：$PROJECT_ROOT/scripts/meteor-skin-macos.sh install"
   fi
   exit 0
 fi
@@ -101,5 +101,5 @@ echo "==> 重载主题并立即应用"
 
 echo ""
 echo "完成！'${THEME_NAME}' 已应用到 Codex（${LAYOUT}）。"
-echo "切换版式：$ACTIVE_ROOT/scripts/autoskin-macos.sh theme $THEME_NAME banner"
+echo "切换版式：$ACTIVE_ROOT/scripts/meteor-skin-macos.sh theme $THEME_NAME banner"
 echo "想精修时，可以让 agent 按 THEME-SPEC.md 调整这个主题。"
