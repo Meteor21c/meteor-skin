@@ -85,6 +85,6 @@ fi
   }, null, 2) + "\n");
 ' "$INSTALL_STATE_PATH" "$PORT" "$APP_BUNDLE" "$NODE_BIN" "$RUNTIME_ROOT" "$SOURCE_ROOT"
 
-echo "Codex Dream Skin installed for macOS."
+echo "Meteor Skin installed for macOS."
 echo "Installed runtime: $RUNTIME_ROOT"
-echo "Launch it with: $RUNTIME_SCRIPTS/autoskin-macos.sh start"
+echo "Launch it with: $RUNTIME_SCRIPTS/meteor-skin-macos.sh start"

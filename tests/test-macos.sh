@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NODE_BIN="${NODE_BIN:-$(command -v node)}"
-TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/codex-autoskin-test.XXXXXX")"
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/meteor-skin-test.XXXXXX")"
 echo "Test artifacts will be kept at: $TMP_ROOT"
 
 fail() {
@@ -110,7 +110,8 @@ for entry in scripts assets styles themes .runtime.json; do
   [ -e "$RUNTIME_ROOT/$entry" ] || fail "runtime is missing $entry"
 done
 [ -L "$RUNTIME_ROOT/themes-private" ] || fail "runtime private themes are not linked to durable storage"
-[ -x "$RUNTIME_ROOT/scripts/autoskin-macos.sh" ] || fail "runtime scripts lost executable permissions"
+[ -x "$RUNTIME_ROOT/scripts/meteor-skin-macos.sh" ] || fail "primary runtime entry lost executable permissions"
+[ -x "$RUNTIME_ROOT/scripts/autoskin-macos.sh" ] || fail "legacy runtime wrapper is missing"
 "$NODE_BIN" "$ROOT/scripts/sync-macos-runtime.mjs" \
   --source "$ROOT" --destination "$RUNTIME_ROOT" >/dev/null
 "$NODE_BIN" "$RUNTIME_ROOT/scripts/injector.mjs" --themes >/dev/null
@@ -212,10 +213,10 @@ HOME="$TEST_HOME" /bin/bash -c '
 echo "Checking isolated one-command installation..."
 mkdir -p "$TEST_HOME/.codex"
 printf '%s\n' '[desktop]' 'appearanceTheme = "dark"' >"$TEST_HOME/.codex/config.toml"
-HOME="$TEST_HOME" "$ROOT/scripts/autoskin-macos.sh" install \
+HOME="$TEST_HOME" "$ROOT/scripts/meteor-skin-macos.sh" install \
   --no-start --no-auto-recover --port 19337 --app "$FAKE_APP" --node "$NODE_BIN" >/dev/null
 INSTALLED_ROOT="$TEST_HOME/Library/Application Support/CodexDreamSkin"
-[ -x "$INSTALLED_ROOT/runtime/scripts/autoskin-macos.sh" ] || fail "unified installer did not create a stable runtime"
+[ -x "$INSTALLED_ROOT/runtime/scripts/meteor-skin-macos.sh" ] || fail "unified installer did not create a stable runtime"
 [ -f "$INSTALLED_ROOT/config.before-dream-skin.toml" ] || fail "unified installer did not back up base colors"
 [ ! -e "$TEST_HOME/Library/LaunchAgents/com.codex-autoskin.watcher.plist" ] || fail "--no-auto-recover installed a LaunchAgent"
 HOME="$TEST_HOME" /bin/bash -c '
@@ -223,7 +224,7 @@ HOME="$TEST_HOME" /bin/bash -c '
   . "$1/runtime/scripts/lib/mac-common.sh"
   [ "$(dream_installed_port)" = "19337" ]
 ' test "$INSTALLED_ROOT"
-HOME="$TEST_HOME" "$INSTALLED_ROOT/runtime/scripts/autoskin-macos.sh" quick-theme \
+HOME="$TEST_HOME" "$INSTALLED_ROOT/runtime/scripts/meteor-skin-macos.sh" quick-theme \
   "$ROOT/themes/aurora-veil/art.png" --name installed-quick-theme --no-apply --node "$NODE_BIN" >/dev/null
 [ -f "$INSTALLED_ROOT/themes-private/installed-quick-theme/theme.json" ] || fail "installed quick-theme did not persist its theme"
 "$NODE_BIN" "$INSTALLED_ROOT/runtime/scripts/injector.mjs" --themes >"$TMP_ROOT/installed-themes.json"

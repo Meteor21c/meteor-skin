@@ -1,6 +1,6 @@
 <div align="center">
 
-# Codex AutoSkin
+# Meteor Skin
 
 **画像を 1 枚渡すだけ。あなたの Codex が自分でスキンを着替えます。**
 
@@ -49,7 +49,7 @@ Codex が自分でクローン・インストールし、画像からテーマ�
 下記の一文を、お気に入りの画像（横長・被写体は右寄せ・文字/透かしなし）とともに Codex に送るだけ：
 
 ```text
-この Codex スキンエンジンをインストールして: https://github.com/Meteor21c/codex-autoskin 、そのあと添付した画像でテーマを生成してすぐ適用して
+https://github.com/Meteor21c/meteor-skin から Meteor Skin をインストールし、添付画像からテーマを生成して適用して
 ```
 
 あとは全自動。画像がなくても内蔵テーマで先に点灯し、あとから追加できます。AI を使いたくない場合は、下のプラットフォーム別の手動手順へ。
@@ -87,8 +87,8 @@ Codex が自分でクローン・インストールし、画像からテーマ�
 前提：Windows 10/11、Microsoft Store 版 Codex（一度起動・ログイン済み）。インストーラーは Codex 内蔵の互換 Node.js を優先し、利用できない場合のみシステムの [Node.js ≥ 20](https://nodejs.org/ja) を使用します。
 
 ```powershell
-git clone https://github.com/Meteor21c/codex-autoskin.git   # または Download ZIP で展開
-cd codex-autoskin
+git clone https://github.com/Meteor21c/meteor-skin.git   # または Download ZIP で展開
+cd meteor-skin
 
 .\quickstart.ps1                              # ① インストール & 起動 — Codex が内蔵テーマで点灯
 .\quick-theme.ps1 -Image C:\path\your.png     # ② あなたの画像がそのままテーマに
@@ -100,15 +100,15 @@ cd codex-autoskin
 
 前提：公式 Codex Mac アプリ（一度起動・ログイン済み）。**Node.js のインストールは不要**——スクリプトが Codex 内蔵のランタイムを再利用します。
 
-1. **ダウンロードして展開**——GitHub → Code → Download ZIP、Finder で `codex-autoskin` フォルダを開く；
-2. **ダブルクリックでインストール**——`Install AutoSkin on macOS.command` を開く（Codex 起動中なら再起動の可否を確認します）；
-3. **画像を選んで生成**——`Create AutoSkin Theme on macOS.command` を開いて PNG/JPG を選ぶ（ファイルへドラッグしても可）。自動で配色抽出・生成・適用します。
+1. **ダウンロードして展開**——GitHub → Code → Download ZIP、Finder で `meteor-skin` フォルダを開く；
+2. **ダブルクリックでインストール**——`Install Meteor Skin on macOS.command` を開く（Codex 起動中なら再起動の可否を確認します）；
+3. **画像を選んで生成**——`Create Meteor Skin Theme on macOS.command` を開いて PNG/JPG を選ぶ（ファイルへドラッグしても可）。自動で配色抽出・生成・適用します。
 
 通常インストールは既存の Codex プロファイルを使うため、**プロジェクト・タスク・チャット・ログインは消えません**。「開発元を確認できない」と出たら [FAQ](#-faq) へ。ターミナル版：
 
 ```bash
-scripts/autoskin-macos.sh install
-scripts/autoskin-macos.sh quick-theme "/path/to/your.png" --name my-theme
+scripts/meteor-skin-macos.sh install
+scripts/meteor-skin-macos.sh quick-theme "/path/to/your.png" --name my-theme
 ```
 
 **画像の要件（両プラットフォーム共通）**：PNG / JPG、横長で幅 ≥ 1600px、被写体は右寄せ（左側にタイトルが乗ります）、画像内に文字 / 透かし / UI を含まないこと。素材の権利は各自の責任で確認してください。
@@ -131,19 +131,19 @@ scripts/autoskin-macos.sh quick-theme "/path/to/your.png" --name my-theme
 インストール時に、自己完結型のランタイムを `~/Library/Application Support/CodexDreamSkin/runtime` へアトミックに同期します。個人テーマは隣の `themes-private` に保存され、ランタイム更新でも失われません。ダウンロードしたリポジトリを削除しても、安定エントリから利用できます：
 
 ```bash
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" start
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" start
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
 ```
 
 よく使うコマンド（インストール時に選んだポート / アプリパスは記憶されます）：
 
 ```bash
-scripts/autoskin-macos.sh doctor                                  # 診断：アプリ、内蔵 Node、状態ディレクトリ、CDP ポート
-scripts/autoskin-macos.sh theme ember-bloom fullscreen            # テーマ切替
-scripts/autoskin-macos.sh verify --screenshot "$PWD/shot.png"     # 検証 + ネイティブウィンドウ ID でスクショ
-scripts/autoskin-macos.sh uninstall                               # 完全アンインストール（繰り返し実行可）
+scripts/meteor-skin-macos.sh doctor                                  # 診断：アプリ、内蔵 Node、状態ディレクトリ、CDP ポート
+scripts/meteor-skin-macos.sh theme ember-bloom fullscreen            # テーマ切替
+scripts/meteor-skin-macos.sh verify --screenshot "$PWD/shot.png"     # 検証 + ネイティブウィンドウ ID でスクショ
+scripts/meteor-skin-macos.sh uninstall                               # 完全アンインストール（繰り返し実行可）
 scripts/install-dream-skin.sh --app "$HOME/Apps/ChatGPT.app"      # 非標準のインストール先
-scripts/autoskin-macos.sh install --port 19335                    # ポートが埋まっている場合は一度だけ指定
+scripts/meteor-skin-macos.sh install --port 19335                    # ポートが埋まっている場合は一度だけ指定
 ```
 
 トラブルシューティングのログは `~/Library/Application Support/CodexDreamSkin/` に：`injector-error.log`（テーマ走査/注入）、`watcher.log`（自動復旧/ブレーカー）、`launch-agent-error.log`（LaunchAgent）。
@@ -159,7 +159,7 @@ scripts\restore-dream-skin.ps1                     # Windows：公式の見た�
 ```
 
 ```bash
-scripts/autoskin-macos.sh theme aurora-veil fullscreen   # macOS：テーマ切替
+scripts/meteor-skin-macos.sh theme aurora-veil fullscreen   # macOS：テーマ切替
 scripts/restore-dream-skin.sh                            # macOS：公式の見た目に復元
 ```
 
@@ -201,16 +201,16 @@ scripts/restore-dream-skin.sh                            # macOS：公式の見�
 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` を実行。ZIP でダウンロードした場合はさらに `Get-ChildItem -Recurse | Unblock-File`。
 
 **macOS で「開発元を確認できない」と出る？**
-`.command` ファイルを右クリック → **開く** で一度確認。実行権限がない場合はリポジトリ内で `chmod +x ./*.command ./scripts/*.sh`。ダウンロード隔離でまだブロックされ、本リポジトリ由来だと確認できる場合は `xattr -dr com.apple.quarantine "/path/to/codex-autoskin"`。
+`.command` ファイルを右クリック → **開く** で一度確認。実行権限がない場合はリポジトリ内で `chmod +x ./*.command ./scripts/*.sh`。ダウンロード隔離でまだブロックされ、本リポジトリ由来だと確認できる場合は `xattr -dr com.apple.quarantine "/path/to/meteor-skin"`。
 
 **macOS でスクショ検証に失敗する？**
 コマンドを実行するターミナル（またはエージェント）に「画面収録」権限を付与して再試行してください——mac ではネイティブウィンドウ ID で撮るため、他のウィンドウが重なっても正しく撮れます。
 
 **Codex 更新後にスキンが消えた？**
-Windows は `.\quickstart.ps1`、macOS は `scripts/autoskin-macos.sh install` を再実行。どちらも現在のアプリを動的に検出し、バージョン依存のパスは保存しません。
+Windows は `.\quickstart.ps1`、macOS は `scripts/meteor-skin-macos.sh install` を再実行。どちらも現在のアプリを動的に検出し、バージョン依存のパスは保存しません。
 
 **ポート 9335 が使用中？**
-Windows：`.\quickstart.ps1 -Port 9345`（以降のスクリプトも同じポートで）。macOS：`scripts/autoskin-macos.sh install --port 19335`（以降の統合コマンドが記憶します）。
+Windows：`.\quickstart.ps1 -Port 9345`（以降のスクリプトも同じポートで）。macOS：`scripts/meteor-skin-macos.sh install --port 19335`（以降の統合コマンドが記憶します）。
 
 **Codex のアカウントやデータに影響は？**
 ありません。公式ファイルを変更せず、ログインやセッションにも触れず、注入はループバックのみ。装飾目的のコミュニティプロジェクトです（[免責事項](#%EF%B8%8F-免責事項)参照）。
@@ -219,7 +219,7 @@ Windows：`.\quickstart.ps1 -Port 9345`（以降のスクリプトも同じポ�
 純粋な CSS/JS 装飾レイヤーと軽量な常駐プロセスだけで、通常利用では体感できません。
 
 **完全にアンインストールするには？**
-Windows：`scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`。macOS：`scripts/autoskin-macos.sh uninstall`。その後は通常どおり Codex を起動すれば公式のままです。
+Windows：`scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`。macOS：`scripts/meteor-skin-macos.sh uninstall`。その後は通常どおり Codex を起動すれば公式のままです。
 
 **対応プラットフォームは？**
 Windows（Store 版 Codex）と macOS（公式デスクトップアプリ）。Linux はまだ未対応——PR 歓迎です。
@@ -230,7 +230,7 @@ Windows（Store 版 Codex）と macOS（公式デスクトップアプリ）。L
 
 ## 💬 プロジェクトについて
 
-CDP 注入で Codex を着せ替えるという発想の初代（当時は **Dream Skin**）は私が作りました。この遊びがコミュニティに広がっていくのを見られて嬉しく思います。AutoSkin はその全面リライトです：v1 は「Codex を着せ替えられるか？」に答え、この版は「誰もが画像 1 枚で自分のスキンを得るには？」に答えます。
+上流の歴史：CDP 注入で Codex を着せ替える初期プロジェクトは **Dream Skin** と呼ばれ、その後、上流で **AutoSkin** として全面的に書き直されました。Meteor Skin は、その履歴と帰属表示を維持する独立保守の派生版です。
 
 2.0 は一貫して AI とのペアプログラミングで作りました。方針・設計から失敗の一つひとつまで、意思決定の全記録を [DEVLOG.md](DEVLOG.md) で公開しています——最後まで透明なサイバー開発の実験で、更新を続けます。macOS 対応はコミュニティ貢献者 [@keyuchen21](https://github.com/keyuchen21) によるもので、公開の翌日に届きました——オープンソースが本来のかたちで機能した瞬間です。
 

@@ -31,25 +31,25 @@ dream_validate_port "$PORT"
 dream_resolve_app "$APP_PATH"
 dream_resolve_node "$NODE_PATH"
 
-echo "[1/4] Checking Codex and AutoSkin status..."
+echo "[1/4] Checking Codex and Meteor Skin status..."
 START_ARGS=(--port "$PORT" --app "$APP_BUNDLE" --node "$NODE_BIN")
 if ! dream_cdp_ready "$PORT" && [ -n "$(dream_main_pids)" ]; then
   if [ "$ALLOW_RESTART" -ne 1 ]; then
     if [ -t 0 ]; then
-      printf 'Codex is open without AutoSkin. Restart Codex now? [y/N] '
+      printf 'Codex is open without Meteor Skin. Restart Codex now? [y/N] '
       read -r answer
       case "$answer" in
         y|Y|yes|YES|Yes) ALLOW_RESTART=1 ;;
         *) dream_die "activation cancelled; Codex was left open and unchanged" ;;
       esac
     else
-      dream_die "Codex is open without AutoSkin. Rerun interactively or pass --restart-existing after user approval."
+      dream_die "Codex is open without Meteor Skin. Rerun interactively or pass --restart-existing after user approval."
     fi
   fi
   START_ARGS+=(--restart-existing)
 fi
 
-echo "[2/4] Starting or hot-reloading AutoSkin..."
+echo "[2/4] Starting or hot-reloading Meteor Skin..."
 "$SCRIPT_DIR/start-dream-skin.sh" "${START_ARGS[@]}"
 
 if [ -n "$THEME" ]; then
@@ -61,5 +61,5 @@ fi
 
 echo "[4/4] Verifying the live skin..."
 "$NODE_BIN" "$SCRIPT_DIR/injector.mjs" --verify --port "$PORT" --timeout-ms 12000 >/dev/null
-echo "Codex AutoSkin is active on port $PORT."
-/usr/bin/osascript -e 'display notification "AutoSkin is active. Use Codex Settings → Appearance for light/dark mode." with title "Codex AutoSkin"' >/dev/null 2>&1 || true
+echo "Meteor Skin is active on port $PORT."
+/usr/bin/osascript -e 'display notification "Meteor Skin is active. Use Codex Settings → Appearance for light/dark mode." with title "Meteor Skin"' >/dev/null 2>&1 || true

@@ -121,4 +121,4 @@ for ($attempt = 0; $attempt -lt 45; $attempt++) {
   if ($LASTEXITCODE -eq 0) { $verified = $true; break }
 }
 if (-not $verified) { throw 'Dream skin launched but verification failed. See injector logs.' }
-Write-Host "Codex Dream Skin is active on port $Port."
+Write-Host "Meteor Skin is active on port $Port."

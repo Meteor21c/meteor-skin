@@ -69,7 +69,7 @@ try {
 
     if ($debugReady -and (Test-InjectorHealthy)) {
       if ($consecutiveFailures -gt 0 -or $null -ne $suspendedUntil) {
-        Write-WatcherLog 'Dream Skin is healthy again; resuming normal watch.'
+        Write-WatcherLog 'Meteor Skin is healthy again; resuming normal watch.'
       }
       $consecutiveFailures = 0
       $suspendedUntil = $null
@@ -125,7 +125,7 @@ try {
       # terminate the user's Codex from a background watcher. The explicit launcher
       # can ask for consent and then restart if the user wants the skin immediately.
       $suspendedUntil = (Get-Date).AddMinutes($CooldownMinutes)
-      Write-WatcherLog "Codex is running without the Dream Skin debug port. No restart was attempted. Use the Codex Dream Skin shortcut to activate it; watcher checks resume after $($suspendedUntil.ToString('yyyy-MM-dd HH:mm:ss'))."
+      Write-WatcherLog "Codex is running without the Meteor Skin debug port. No restart was attempted. Use the Meteor Skin shortcut to activate it; watcher checks resume after $($suspendedUntil.ToString('yyyy-MM-dd HH:mm:ss'))."
       Start-Sleep -Seconds ([Math]::Max(1, $PollSeconds))
       continue
     }

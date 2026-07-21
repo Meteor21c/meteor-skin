@@ -4,15 +4,20 @@ param([int]$Port = 9335)
 $ErrorActionPreference = 'Stop'
 $SourceRoot = Split-Path -Parent $PSScriptRoot
 $SkillsRoot = Join-Path $HOME '.codex\skills'
-$TargetRoot = Join-Path $SkillsRoot 'codex-autoskin'
+$TargetRoot = Join-Path $SkillsRoot 'meteor-skin'
+$LegacyRoot = Join-Path $SkillsRoot 'codex-autoskin'
 $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ') + "-$PID"
 New-Item -ItemType Directory -Force -Path $SkillsRoot | Out-Null
+if (Test-Path -LiteralPath $LegacyRoot) {
+  Write-Host "Legacy Skill detected and left untouched: $LegacyRoot" -ForegroundColor Yellow
+  Write-Host 'After verifying Meteor Skin, archive or remove the legacy Skill manually to avoid duplicate triggers.' -ForegroundColor Yellow
+}
 
 $sourceFull = [IO.Path]::GetFullPath($SourceRoot).TrimEnd('\')
 $targetFull = [IO.Path]::GetFullPath($TargetRoot).TrimEnd('\')
 if ($sourceFull -ne $targetFull) {
   if (Test-Path -LiteralPath $TargetRoot) {
-    $backup = Join-Path $SkillsRoot "codex-autoskin.backup-$stamp"
+    $backup = Join-Path $SkillsRoot "meteor-skin.backup-$stamp"
     Move-Item -LiteralPath $TargetRoot -Destination $backup
     Write-Host "Previous Skill archived for recovery: $backup"
   }

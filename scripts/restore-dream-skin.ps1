@@ -34,14 +34,22 @@ try { & $node $injector --remove --port $Port --timeout-ms 3000 } catch {}
 if ($Uninstall) {
   $desktop = [Environment]::GetFolderPath('Desktop')
   $startMenu = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs'
-  $desktopStart = Join-Path $desktop 'Codex Dream Skin.lnk'
-  $desktopRestore = Join-Path $desktop 'Codex Dream Skin - Restore.lnk'
-  $menuStart = Join-Path $startMenu 'Codex Dream Skin.lnk'
-  $startupWatcher = Join-Path ([Environment]::GetFolderPath('Startup')) 'Codex Dream Skin Watcher.lnk'
+  $desktopStart = Join-Path $desktop 'Meteor Skin.lnk'
+  $desktopRestore = Join-Path $desktop 'Meteor Skin - Restore.lnk'
+  $menuStart = Join-Path $startMenu 'Meteor Skin.lnk'
+  $startupWatcher = Join-Path ([Environment]::GetFolderPath('Startup')) 'Meteor Skin Watcher.lnk'
+  $legacyDesktopStart = Join-Path $desktop 'Codex Dream Skin.lnk'
+  $legacyDesktopRestore = Join-Path $desktop 'Codex Dream Skin - Restore.lnk'
+  $legacyMenuStart = Join-Path $startMenu 'Codex Dream Skin.lnk'
+  $legacyStartupWatcher = Join-Path ([Environment]::GetFolderPath('Startup')) 'Codex Dream Skin Watcher.lnk'
   Remove-Item -LiteralPath $desktopStart -Force -ErrorAction SilentlyContinue
   Remove-Item -LiteralPath $desktopRestore -Force -ErrorAction SilentlyContinue
   Remove-Item -LiteralPath $menuStart -Force -ErrorAction SilentlyContinue
   Remove-Item -LiteralPath $startupWatcher -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyDesktopStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyDesktopRestore -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyMenuStart -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $legacyStartupWatcher -Force -ErrorAction SilentlyContinue
 }
 
 if ($RestoreBaseTheme) {

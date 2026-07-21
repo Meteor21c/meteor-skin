@@ -1,6 +1,6 @@
 <div align="center">
 
-# Codex AutoSkin
+# Meteor Skin
 
 **发一张图，你的 Codex 换上专属皮肤**
 
@@ -49,7 +49,7 @@ Codex 自己克隆、安装、从图里生成主题：
 把下面这句话发给你的 Codex，顺手附一张你喜欢的图（横向、主体靠右、无文字水印）：
 
 ```text
-安装这个 Codex 皮肤引擎：https://github.com/Meteor21c/codex-autoskin ，装好后用我附的这张图生成一个主题并立即应用
+从 https://github.com/Meteor21c/meteor-skin 安装 Meteor Skin，然后用我附的图片生成并应用主题
 ```
 
 剩下的全自动。没附图也行——它会先带着内置主题亮起来，之后随时补图。不想用 AI？往下看各平台的手动版。
@@ -87,8 +87,8 @@ Codex 自己克隆、安装、从图里生成主题：
 前提：Windows 10/11、Microsoft Store 版 Codex（打开并登录过一次）。安装器优先使用 Codex 内置的兼容 Node.js；内置运行时不可用时再使用系统 [Node.js ≥ 20](https://nodejs.org/zh-cn)。
 
 ```powershell
-git clone https://github.com/Meteor21c/codex-autoskin.git   # 或 Download ZIP 解压
-cd codex-autoskin
+git clone https://github.com/Meteor21c/meteor-skin.git   # 或 Download ZIP 解压
+cd meteor-skin
 
 .\quickstart.ps1                             # ① 安装并启动，Codex 带内置主题亮起
 .\quick-theme.ps1 -Image C:\path\你的图.png   # ② 你的图变成主题，立即生效
@@ -100,15 +100,15 @@ cd codex-autoskin
 
 前提：官方 Codex Mac 客户端（打开并登录过一次）。**不需要安装 Node.js**——脚本会自动使用 Codex 内置的运行时。
 
-1. **下载解压**——GitHub 页面 Code → Download ZIP，Finder 打开 `codex-autoskin` 文件夹；
-2. **双击安装**——打开 `Install AutoSkin on macOS.command`（Codex 在运行时会先询问是否重启）；
-3. **选图生成**——打开 `Create AutoSkin Theme on macOS.command` 选一张 PNG/JPG（或把图直接拖到该文件上），自动取色、生成、应用。
+1. **下载解压**——GitHub 页面 Code → Download ZIP，Finder 打开 `meteor-skin` 文件夹；
+2. **双击安装**——打开 `Install Meteor Skin on macOS.command`（Codex 在运行时会先询问是否重启）；
+3. **选图生成**——打开 `Create Meteor Skin Theme on macOS.command` 选一张 PNG/JPG（或把图直接拖到该文件上），自动取色、生成、应用。
 
 普通安装使用原有 Codex profile，**不会清空项目、任务、聊天记录或登录状态**。提示“无法验证开发者”见 [FAQ](#-faq)。终端党等价命令：
 
 ```bash
-scripts/autoskin-macos.sh install
-scripts/autoskin-macos.sh quick-theme "/path/to/你的图.png" --name my-theme
+scripts/meteor-skin-macos.sh install
+scripts/meteor-skin-macos.sh quick-theme "/path/to/你的图.png" --name my-theme
 ```
 
 **图片要求（两端一致）**：PNG / JPG，横向图宽度 ≥ 1600，主体尽量靠右（左侧压标题文字），画面无文字 / 水印 / 界面元素，素材版权责任自负。
@@ -131,19 +131,19 @@ scripts/autoskin-macos.sh quick-theme "/path/to/你的图.png" --name my-theme
 安装时会把自包含运行文件原子同步到 `~/Library/Application Support/CodexDreamSkin/runtime`，个人主题另存于旁边的 `themes-private`（更新运行文件不会丢）。删掉下载的仓库后仍可用稳定入口：
 
 ```bash
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" start
-"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/autoskin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" start
+"$HOME/Library/Application Support/CodexDreamSkin/runtime/scripts/meteor-skin-macos.sh" quick-theme "/path/to/image.jpg" --name my-theme
 ```
 
 常用命令（安装时选的端口 / App 路径会被记住，无需重复传参）：
 
 ```bash
-scripts/autoskin-macos.sh doctor                                  # 体检：App、内置 Node、状态目录、CDP 端口
-scripts/autoskin-macos.sh theme ember-bloom fullscreen            # 切主题
-scripts/autoskin-macos.sh verify --screenshot "$PWD/shot.png"     # 验证 + 按原生窗口 ID 截图
-scripts/autoskin-macos.sh uninstall                               # 完整卸载（可重复执行）
+scripts/meteor-skin-macos.sh doctor                                  # 体检：App、内置 Node、状态目录、CDP 端口
+scripts/meteor-skin-macos.sh theme ember-bloom fullscreen            # 切主题
+scripts/meteor-skin-macos.sh verify --screenshot "$PWD/shot.png"     # 验证 + 按原生窗口 ID 截图
+scripts/meteor-skin-macos.sh uninstall                               # 完整卸载（可重复执行）
 scripts/install-dream-skin.sh --app "$HOME/Apps/ChatGPT.app"      # 非标准安装位置
-scripts/autoskin-macos.sh install --port 19335                    # 端口被占时指定一次即可
+scripts/meteor-skin-macos.sh install --port 19335                    # 端口被占时指定一次即可
 ```
 
 排查日志都在 `~/Library/Application Support/CodexDreamSkin/`：`injector-error.log`（主题扫描/注入）、`watcher.log`（自动恢复/熔断）、`launch-agent-error.log`（LaunchAgent）。
@@ -159,7 +159,7 @@ scripts\restore-dream-skin.ps1                     # Windows 一键还原官方�
 ```
 
 ```bash
-scripts/autoskin-macos.sh theme aurora-veil fullscreen   # macOS 切主题
+scripts/meteor-skin-macos.sh theme aurora-veil fullscreen   # macOS 切主题
 scripts/restore-dream-skin.sh                            # macOS 一键还原官方外观
 ```
 
@@ -201,16 +201,16 @@ scripts/restore-dream-skin.sh                            # macOS 一键还原官
 先执行 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`；ZIP 下载的再执行 `Get-ChildItem -Recurse | Unblock-File`。
 
 **macOS 提示“无法验证开发者”？**
-右键 `.command` 文件 → **打开**，再确认一次。提示没有执行权限则在仓库目录运行 `chmod +x ./*.command ./scripts/*.sh`；仍被下载隔离拦截且确认文件来自本仓库时，可运行 `xattr -dr com.apple.quarantine "/path/to/codex-autoskin"`。
+右键 `.command` 文件 → **打开**，再确认一次。提示没有执行权限则在仓库目录运行 `chmod +x ./*.command ./scripts/*.sh`；仍被下载隔离拦截且确认文件来自本仓库时，可运行 `xattr -dr com.apple.quarantine "/path/to/meteor-skin"`。
 
 **macOS 截图验证失败？**
 给运行命令的终端（或 agent）授予“屏幕录制”权限后重试——mac 端按原生窗口 ID 截图，被其它窗口遮挡也不会截错。
 
 **Codex 更新后皮肤消失了？**
-Windows 重跑 `.\quickstart.ps1`；macOS 重跑 `scripts/autoskin-macos.sh install`。两端都动态发现当前应用，不存版本化路径。
+Windows 重跑 `.\quickstart.ps1`；macOS 重跑 `scripts/meteor-skin-macos.sh install`。两端都动态发现当前应用，不存版本化路径。
 
 **端口 9335 被占用？**
-Windows：`.\quickstart.ps1 -Port 9345`，后续脚本保持同端口。macOS：`scripts/autoskin-macos.sh install --port 19335`，之后的统一命令会记住它。
+Windows：`.\quickstart.ps1 -Port 9345`，后续脚本保持同端口。macOS：`scripts/meteor-skin-macos.sh install --port 19335`，之后的统一命令会记住它。
 
 **会影响我的 Codex 账号和数据吗？**
 不会改任何官方文件、不碰登录态与会话，注入仅在本机回环进行；属装饰性社区项目，见[免责声明](#%EF%B8%8F-免责声明)。
@@ -219,7 +219,7 @@ Windows：`.\quickstart.ps1 -Port 9345`，后续脚本保持同端口。macOS：
 注入的是一层纯 CSS/JS 装饰与一个轻量守护进程，正常使用感知不到。
 
 **怎么彻底卸载？**
-Windows：`scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`；macOS：`scripts/autoskin-macos.sh uninstall`。之后正常启动 Codex 即为纯官方状态。
+Windows：`scripts\restore-dream-skin.ps1 -Uninstall -RestoreBaseTheme`；macOS：`scripts/meteor-skin-macos.sh uninstall`。之后正常启动 Codex 即为纯官方状态。
 
 **支持哪些平台？**
 Windows（Store 版 Codex）与 macOS（官方桌面客户端）。Linux 暂未支持，欢迎 PR。
@@ -230,7 +230,7 @@ Windows（Store 版 Codex）与 macOS（官方桌面客户端）。Linux 暂未�
 
 ## 💬 关于
 
-用 CDP 注入给 Codex 换肤的初版（当时叫 **Dream Skin**）出自我之手，很高兴看到这个玩法在社区里开枝散叶。AutoSkin 是对这个想法的全面重写：v1 回答“能不能换肤”，这一版回答“怎么让任何人发一张图就得到自己的皮肤”。
+上游历史：最初通过 CDP 注入给 Codex 换肤的项目名为 **Dream Skin**，随后由上游重写为 **AutoSkin**。Meteor Skin 是在完整保留该历史和署名基础上的独立维护衍生版本。
 
 整个 2.0 由作者与 AI 结对完成，从定位、架构到每一次翻车的完整决策记录公开在 [DEVLOG.md](DEVLOG.md)——算是一次全程透明的赛博开发实验，会随迭代持续更新。macOS 支持由社区贡献者 [@keyuchen21](https://github.com/keyuchen21) 完成，发布次日抵达——开源精神照进现实。
 

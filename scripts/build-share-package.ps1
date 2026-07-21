@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'lib\windows-common.ps1')
 $node = Get-DreamNodePath
 $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
-$packageName = "Codex-AutoSkin-Portable-2.3.0-$stamp"
+$packageName = "Meteor-Skin-Portable-2.3.0-$stamp"
 $packageDir = Join-Path $OutputRoot $packageName
 $zipPath = Join-Path $OutputRoot "$packageName.zip"
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null

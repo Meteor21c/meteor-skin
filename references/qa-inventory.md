@@ -11,7 +11,7 @@
 7. The skin survives route changes and renderer reloads while the injector daemon runs.
 8. The official Store package and `app.asar` remain unchanged.
 9. Restore removes the injected DOM/CSS and install/restore can be repeated.
-10. Adaptive themes follow Codex Settings → Appearance without reapplying the AutoSkin theme or restarting Codex.
+10. Adaptive themes follow Codex Settings → Appearance without reapplying the Meteor Skin theme or restarting Codex.
 11. Installers create a stable runtime and a reusable activation entry; an existing unskinned Codex is never restarted without approval.
 
 ## Functional checks
@@ -37,7 +37,7 @@
 - Update resilience: Windows resolves the current `OpenAI.Codex` Appx location dynamically; macOS discovers `ChatGPT.app` / `Codex.app` and reads `CFBundleExecutable` from `Info.plist`. Never store a versioned executable path.
 - macOS lifecycle: launch the app bundle through LaunchServices and confirm it remains alive after the invoking shell exits; do not execute `Contents/MacOS/ChatGPT` directly.
 - macOS screenshot: `verify-dream-skin.sh --screenshot <path>` captures the Codex window itself by Quartz window ID even when another app overlaps it; it must not use CDP `Page.captureScreenshot`.
-- macOS simple install: with `PATH` restricted to system utilities and no external `node`, `autoskin-macos.sh install --no-start --no-auto-recover` uses the official app's bundled Node.js, applies the base theme, creates the backup, and does not install a LaunchAgent.
+- macOS simple install: with `PATH` restricted to system utilities and no external `node`, `meteor-skin-macos.sh install --no-start --no-auto-recover` uses the official app's bundled Node.js, applies the base theme, creates the backup, and does not install a LaunchAgent.
 - macOS stable install: after installation, move the source checkout and confirm the installed runtime can still activate, verify, switch themes, repair its injector, and uninstall. Reinstalling atomically refreshes the runtime without leaving the old watcher/injector alive.
 - macOS remembered defaults: install with a non-default port and app path, then run `start`, `theme`, `verify`, `doctor`, and `uninstall` without repeating them; each command must use `install-state.json`. Full uninstall must succeed repeatedly even when no base-color backup remains.
 - macOS quick-theme: generate one light and one dark route from PNG/JPG fixtures, confirm exactly 28 tokens and valid injector discovery, repeat generation safely, reject a built-in/manual name collision, refresh the stable runtime, and confirm private themes survive. When CDP is active, reload without restarting Codex and apply the requested layout.

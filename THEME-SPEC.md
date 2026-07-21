@@ -1,4 +1,4 @@
-# THEME-SPEC — Codex AutoSkin 主题定制规范（写给 Agent 读）
+# THEME-SPEC — Meteor Skin 主题定制规范（写给 Agent 读）
 
 > 读者设定：你是用户的 Codex / Claude agent。用户丢给你一张图片说"给我的 Codex 做个这样的皮肤"。
 > 你只需要读完本文件，产出一个主题文件夹，不需要读引擎源码。
@@ -100,7 +100,7 @@ themes/<name>/            # 公开主题；本地私用放 themes-private/<name>
 - 同时包含 `modes.light` 与 `modes.dark`：`adaptive` 主题。
 - `modes.*.tokens` 是增量覆盖，不需要重复 28 个必需 token；继承顺序是结构默认值 → 基础 `tokens` → 当前模式 tokens。
 - `modes.*.cards`、`modes.*.composer` 与 `modes.*.meta` 同样继承基础字段。
-- 根节点的 `.electron-light` / `.electron-dark` 由 Codex 官方外观设置维护；AutoSkin 只观察并切换变量，不重新应用主题，也不重启应用。
+- 根节点的 `.electron-light` / `.electron-dark` 由 Codex 官方外观设置维护；Meteor Skin 只观察并切换变量，不重新应用主题，也不重启应用。
 - `node scripts/injector.mjs --themes` 的 `appearance` 字段会显示 `single`、`light`、`dark` 或 `adaptive`。
 
 ## 3. 28 个 token 逐个说明

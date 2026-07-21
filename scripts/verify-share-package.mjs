@@ -12,13 +12,13 @@ function parseArgs(argv) {
 const packageRoot = parseArgs(process.argv.slice(2));
 const required = [
   "INSTALL_FOR_CODEX.md",
-  "Install AutoSkin on macOS.command",
-  "Install AutoSkin on Windows.cmd",
+  "Install Meteor Skin on macOS.command",
+  "Install Meteor Skin on Windows.cmd",
   "PACKAGE.json",
   "SHA256SUMS.txt",
-  "codex-autoskin/SKILL.md",
-  "codex-autoskin/scripts/activate-dream-skin.sh",
-  "codex-autoskin/scripts/activate-dream-skin.ps1",
+  "meteor-skin/SKILL.md",
+  "meteor-skin/scripts/activate-dream-skin.sh",
+  "meteor-skin/scripts/activate-dream-skin.ps1",
 ];
 for (const name of required) {
   const stat = await fs.stat(path.join(packageRoot, ...name.split("/"))).catch(() => null);
@@ -53,7 +53,7 @@ const forbidden = [
 const inspectExtensions = new Set([".sh", ".command", ".mjs", ".js", ".ps1", ".cmd"]);
 for (const line of checksumLines) {
   const name = /^([a-f0-9]{64})  (.+)$/.exec(line)[2];
-  if (!name.startsWith("codex-autoskin/")) continue;
+  if (!name.startsWith("meteor-skin/")) continue;
   if (!inspectExtensions.has(path.extname(name).toLowerCase())) continue;
   const content = await fs.readFile(path.join(packageRoot, ...name.split("/")), "utf8");
   for (const pattern of forbidden) {

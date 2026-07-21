@@ -311,7 +311,7 @@ if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
 const info = runSips(["-g", "pixelWidth", "-g", "pixelHeight", image]);
 const width = Number(/pixelWidth:\s*(\d+)/.exec(info)?.[1]);
 const height = Number(/pixelHeight:\s*(\d+)/.exec(info)?.[1]);
-const temporary = await fs.mkdtemp(path.join(os.tmpdir(), "codex-autoskin-theme-"));
+const temporary = await fs.mkdtemp(path.join(os.tmpdir(), "meteor-skin-theme-"));
 let analysis;
 let sample;
 try {
@@ -339,7 +339,7 @@ const manifest = {
   meta: {
     button,
     brand: title,
-    edition: `${title} · AutoSkin`,
+    edition: `${title} · Meteor Skin`,
     signature: `${title} ✦`,
   },
   art: { home: artFile, chat: artFile },

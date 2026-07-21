@@ -1,6 +1,6 @@
 @echo off
 setlocal
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0codex-autoskin\scripts\install-shared-package.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0meteor-skin\scripts\install-shared-package.ps1"
 if errorlevel 1 (
   echo.
   echo Installation failed. Review the message above.

@@ -7,7 +7,7 @@ dream_resolve_node ""
 
 OUTPUT_ROOT="${1:-$(pwd)/dist}"
 STAMP="$(date -u '+%Y%m%dT%H%M%SZ')"
-PACKAGE_NAME="Codex-AutoSkin-Portable-2.3.0-$STAMP"
+PACKAGE_NAME="Meteor-Skin-Portable-2.3.0-$STAMP"
 PACKAGE_DIR="$OUTPUT_ROOT/$PACKAGE_NAME"
 ZIP_PATH="$OUTPUT_ROOT/$PACKAGE_NAME.zip"
 mkdir -p "$OUTPUT_ROOT"

@@ -1,4 +1,4 @@
-﻿# quickstart.ps1 — 一条命令装好 Codex AutoSkin：自检环境 -> 安装 -> 启动 -> 点亮默认主题。
+﻿# quickstart.ps1 — 一条命令装好 Meteor Skin：自检环境 -> 安装 -> 启动 -> 点亮默认主题。
 #
 #   .\quickstart.ps1
 #
@@ -22,7 +22,7 @@ function Note([string]$Message) { Write-Host "    $Message" -ForegroundColor Yel
 function Fail([string]$Message) { Write-Host "[X] $Message" -ForegroundColor Red; exit 1 }
 
 Write-Host ''
-Write-Host 'Codex AutoSkin 快速安装' -ForegroundColor Magenta
+Write-Host 'Meteor Skin 快速安装' -ForegroundColor Magenta
 Write-Host ''
 
 # ---------------------------------------------------------------------------

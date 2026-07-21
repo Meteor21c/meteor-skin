@@ -111,7 +111,7 @@ while :; do
 
   if [ "$DEBUG_READY" -eq 1 ] && injector_healthy; then
     if [ "$CONSECUTIVE_FAILURES" -gt 0 ] || [ "$SUSPENDED_UNTIL" -gt 0 ]; then
-      write_log "Dream Skin is healthy again; resuming normal watch."
+      write_log "Meteor Skin is healthy again; resuming normal watch."
     fi
     CONSECUTIVE_FAILURES=0
     SUSPENDED_UNTIL=0
@@ -175,7 +175,7 @@ while :; do
     # watcher must never terminate the user's running Codex. The interactive
     # activator asks for consent before a restart when activation needs one.
     SUSPENDED_UNTIL=$((NOW + COOLDOWN_MINUTES * 60))
-    write_log "Codex is running without the Dream Skin debug port. No restart was attempted. Use the Start Codex AutoSkin entry to activate it; watcher checks resume in $COOLDOWN_MINUTES minutes."
+    write_log "Codex is running without the Meteor Skin debug port. No restart was attempted. Use the Start Meteor Skin entry to activate it; watcher checks resume in $COOLDOWN_MINUTES minutes."
     sleep "$POLL_SECONDS"
     continue
   fi

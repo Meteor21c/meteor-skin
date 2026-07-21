@@ -1,19 +1,19 @@
 # Portable distribution
 
-Use this reference when building, inspecting, sharing, or installing an AutoSkin package.
+Use this reference when building, inspecting, sharing, or installing a Meteor Skin package.
 
 ## Package contract
 
 The generated directory and ZIP contain:
 
 ```text
-Codex-AutoSkin-Portable-<version>-<timestamp>/
+Meteor-Skin-Portable-<version>-<timestamp>/
   INSTALL_FOR_CODEX.md
-  Install AutoSkin on macOS.command
-  Install AutoSkin on Windows.cmd
+  Install Meteor Skin on macOS.command
+  Install Meteor Skin on Windows.cmd
   PACKAGE.json
   SHA256SUMS.txt
-  codex-autoskin/
+  meteor-skin/
     SKILL.md
     agents/
     scripts/
@@ -52,8 +52,9 @@ The staging directory must not already exist. The builder refuses to overwrite a
 
 ## Installation behavior
 
-- The package installs the Skill to `~/.codex/skills/codex-autoskin`.
+- The package installs the Skill to `~/.codex/skills/meteor-skin`.
 - An existing Skill is renamed to a timestamped sibling backup before replacement.
+- A legacy `~/.codex/skills/codex-autoskin` folder is reported but never modified automatically; after validating Meteor Skin, the user may archive it manually to avoid duplicate Skill triggers.
 - macOS installs a stable runtime under `~/Library/Application Support/CodexDreamSkin/runtime`.
 - Windows installs a stable runtime under `%LOCALAPPDATA%\CodexDreamSkin\runtime`.
 - Existing runtimes are archived with timestamps; they are not recursively deleted.

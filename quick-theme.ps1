@@ -310,7 +310,7 @@ $theme = [ordered]@{
   meta = [ordered]@{
     button = $button
     brand = $titleName
-    edition = "$titleName · AutoSkin"
+    edition = "$titleName · Meteor Skin"
     signature = "$titleName ✦"
   }
   art = [ordered]@{

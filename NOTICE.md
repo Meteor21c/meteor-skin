@@ -2,8 +2,9 @@
 
 Last reviewed: 2026-07-21
 
-This notice records the provenance and licensing boundaries of this public
-fork. It is provided for transparency and is not legal advice.
+This notice records the provenance and licensing boundaries of **Meteor
+Skin**, published at <https://github.com/Meteor21c/meteor-skin>. It is provided
+for transparency and is not legal advice.
 
 ## 1. Upstream project
 
@@ -23,7 +24,7 @@ GitHub contributor [@keyuchen21](https://github.com/keyuchen21).
 
 ## 2. Modifications in this fork
 
-The fork is maintained by
+Meteor Skin is maintained by
 [@Meteor21c](https://github.com/Meteor21c). Version 2.3.0 adds or revises,
 among other things:
 
@@ -85,10 +86,15 @@ partnership.
 
 ## 6. Technical and user-content boundaries
 
-AutoSkin uses a loopback Chromium DevTools Protocol connection to inject a
+Meteor Skin uses a loopback Chromium DevTools Protocol connection to inject a
 reversible renderer layer. It does not replace, patch, redistribute, re-sign,
 or claim ownership of the official Codex/ChatGPT application or `app.asar`.
 Compatibility can change when the official application changes.
+
+Legacy internal identifiers such as `dream-*`, `CodexDreamSkin`, and
+`com.codex-autoskin.watcher` are retained only for safe migration and backward
+compatibility. They do not identify the current project name or alter upstream
+attribution.
 
 Users and downstream distributors are responsible for:
 
@@ -109,7 +115,7 @@ notice does not create additional warranties, indemnities, or representations.
 
 最近审阅日期：2026-07-21
 
-本公开仓库派生自
+Meteor Skin 发布于 <https://github.com/Meteor21c/meteor-skin>，本公开仓库派生自
 [Finderchangchang/codex-autoskin](https://github.com/Finderchangchang/codex-autoskin)，
 基础版本为提交
 `25edb4d095684796ded92f1fc2ed6af50a64f0dc`。原始版权声明为
@@ -117,7 +123,7 @@ notice does not create additional warranties, indemnities, or representations.
 [LICENSE](LICENSE) 中完整保留；上游 Git 历史是基础内容作者归属的权威记录，
 macOS 上游贡献同时保留对 [@keyuchen21](https://github.com/keyuchen21) 的致谢。
 
-本 Fork 由 [@Meteor21c](https://github.com/Meteor21c) 维护。2.3.0
+Meteor Skin 由 [@Meteor21c](https://github.com/Meteor21c) 维护。2.3.0
 版本包含自适应明暗主题、原生组件语义配色、稳定运行时、安全激活、非破坏性归档、
 跨平台分发包与校验器等修改。在相关修改依法构成著作权且权利属于维护者的范围内，
 这些修改同样按 MIT 许可证提供；这不会删除、替代或弱化任何原作者及贡献者署名。
@@ -135,6 +141,9 @@ MIT 许可证只覆盖相应权利人有权许可的软件与文档，不授予 
 相关名称仅用于说明兼容对象，使用时应遵守最新的
 [OpenAI 品牌指南](https://openai.com/brand/)。
 
-AutoSkin 仅通过本机回环 CDP 注入可恢复的渲染层，不替换、修改、再签名或分发官方
+Meteor Skin 仅通过本机回环 CDP 注入可恢复的渲染层，不替换、修改、再签名或分发官方
 Codex/ChatGPT 应用及 `app.asar`。项目按 MIT 许可证“现状”提供，不作额外保证。
 本声明用于透明披露，不构成法律意见。
+
+`dream-*`、`CodexDreamSkin`、`com.codex-autoskin.watcher` 等旧内部标识仅为迁移和
+向后兼容而保留，不代表当前项目名称，也不会改变任何上游署名。

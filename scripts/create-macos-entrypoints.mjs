@@ -22,14 +22,14 @@ function shellQuote(value) {
 const options = parseArgs(process.argv.slice(2));
 await fs.mkdir(options.desktop, { recursive: true });
 const activate = path.join(options.runtime, "scripts", "activate-dream-skin.sh");
-const restore = path.join(options.runtime, "scripts", "autoskin-macos.sh");
+const restore = path.join(options.runtime, "scripts", "meteor-skin-macos.sh");
 const files = [
   {
-    name: "Start Codex AutoSkin.command",
-    body: `#!/bin/bash\nset -euo pipefail\nbash ${shellQuote(activate)}\nprintf '\\nAutoSkin is ready. Press Return to close this window. '\nread -r _\n`,
+    name: "Start Meteor Skin.command",
+    body: `#!/bin/bash\nset -euo pipefail\nbash ${shellQuote(activate)}\nprintf '\\nMeteor Skin is ready. Press Return to close this window. '\nread -r _\n`,
   },
   {
-    name: "Restore Codex Appearance.command",
+    name: "Restore Meteor Skin Appearance.command",
     body: `#!/bin/bash\nset -euo pipefail\nbash ${shellQuote(restore)} restore\nprintf '\\nThe live skin was removed. Press Return to close this window. '\nread -r _\n`,
   },
 ];

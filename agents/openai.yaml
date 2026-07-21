@@ -1,4 +1,4 @@
 interface:
-  display_name: "Codex AutoSkin"
+  display_name: "Meteor Skin"
   short_description: "Build, package, verify, and restore adaptive Codex skins"
-  default_prompt: "Use $codex-autoskin to create or safely install an adaptive Codex desktop skin."
+  default_prompt: "Use $meteor-skin to create or safely install an adaptive Codex desktop skin."

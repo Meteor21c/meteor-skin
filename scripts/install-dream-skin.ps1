@@ -63,18 +63,18 @@ if (-not $NoShortcuts) {
   $startScript = Join-Path $RuntimeScripts 'activate-dream-skin.ps1'
   $restoreScript = Join-Path $RuntimeScripts 'restore-dream-skin.ps1'
   foreach ($folder in @($desktop, $startMenu)) {
-    $shortcut = $shell.CreateShortcut((Join-Path $folder 'Codex Dream Skin.lnk'))
+    $shortcut = $shell.CreateShortcut((Join-Path $folder 'Meteor Skin.lnk'))
     $shortcut.TargetPath = $powershell
     $shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$startScript`" -Port $Port"
     $shortcut.WorkingDirectory = $RuntimeRoot
-    $shortcut.Description = 'Launch Codex with the Dream Skin theme engine'
+    $shortcut.Description = 'Launch Codex with the Meteor Skin theme engine'
     $shortcut.Save()
   }
-  $restore = $shell.CreateShortcut((Join-Path $desktop 'Codex Dream Skin - Restore.lnk'))
+  $restore = $shell.CreateShortcut((Join-Path $desktop 'Meteor Skin - Restore.lnk'))
   $restore.TargetPath = $powershell
   $restore.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$restoreScript`" -Port $Port"
   $restore.WorkingDirectory = $RuntimeRoot
-  $restore.Description = 'Remove the live Codex Dream Skin'
+  $restore.Description = 'Remove the live Meteor Skin renderer layer'
   $restore.Save()
 }
 
@@ -83,12 +83,12 @@ if (-not $NoAutoRecover) {
   $powershell = (Get-Command powershell.exe).Source
   $startup = [Environment]::GetFolderPath('Startup')
   $watchScript = Join-Path $RuntimeScripts 'watch-dream-skin.ps1'
-  $watcherShortcutPath = Join-Path $startup 'Codex Dream Skin Watcher.lnk'
+  $watcherShortcutPath = Join-Path $startup 'Meteor Skin Watcher.lnk'
   $watcherShortcut = $shell.CreateShortcut($watcherShortcutPath)
   $watcherShortcut.TargetPath = $powershell
   $watcherShortcut.Arguments = "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$watchScript`" -Port $Port"
   $watcherShortcut.WorkingDirectory = $RuntimeRoot
-  $watcherShortcut.Description = 'Keep the Dream Skin injector healthy without restarting Codex'
+  $watcherShortcut.Description = 'Keep the Meteor Skin injector healthy without restarting Codex'
   $watcherShortcut.Save()
 
   $watcherStatePath = Join-Path $StateRoot 'watcher-state.json'
@@ -105,4 +105,4 @@ if (-not $NoAutoRecover) {
   )
 }
 
-Write-Host "Codex Dream Skin installed to $RuntimeRoot. The watcher repairs the injector but never restarts Codex without consent."
+Write-Host "Meteor Skin installed to $RuntimeRoot. The watcher repairs the injector but never restarts Codex without consent."

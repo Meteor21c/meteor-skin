@@ -36,8 +36,8 @@ const options = parseArgs(process.argv.slice(2));
 if (await exists(options.output)) throw new Error(`Output already exists; choose a new path: ${options.output}`);
 await fs.mkdir(options.output, { recursive: true });
 
-const packagedSkill = path.join(options.output, "codex-autoskin");
-const excludedNames = new Set(["themes-archive", "theme-staging", ".DS_Store"]);
+const packagedSkill = path.join(options.output, "meteor-skin");
+const excludedNames = new Set([".git", "themes-archive", "theme-staging", ".DS_Store"]);
 await fs.cp(skillRoot, packagedSkill, {
   recursive: true,
   preserveTimestamps: true,
@@ -47,13 +47,13 @@ await fs.cp(skillRoot, packagedSkill, {
 });
 
 const templateRoot = path.join(skillRoot, "assets", "distribution");
-for (const name of ["INSTALL_FOR_CODEX.md", "Install AutoSkin on macOS.command", "Install AutoSkin on Windows.cmd"]) {
+for (const name of ["INSTALL_FOR_CODEX.md", "Install Meteor Skin on macOS.command", "Install Meteor Skin on Windows.cmd"]) {
   await fs.copyFile(path.join(templateRoot, name), path.join(options.output, name));
 }
-await fs.chmod(path.join(options.output, "Install AutoSkin on macOS.command"), 0o755);
+await fs.chmod(path.join(options.output, "Install Meteor Skin on macOS.command"), 0o755);
 
 const packageInfo = {
-  name: "codex-autoskin-portable",
+  name: "meteor-skin-portable",
   version: "2.3.0",
   builtAt: new Date().toISOString(),
   platforms: ["macos", "windows"],

@@ -1,4 +1,4 @@
-/* Codex Dream Skin — structure layer.
+/* Meteor Skin — structure layer (legacy dream-* selectors are compatibility API).
    This file only consumes tokens; it must never reference a concrete theme name.
    Per-theme token blocks (`:root.codex-dream-skin.dream-theme-<name> { ... }`) and
    scoped per-theme extra.css are generated/validated by scripts/injector.mjs from

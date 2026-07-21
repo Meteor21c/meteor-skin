@@ -13,17 +13,17 @@ $start = Join-Path $PSScriptRoot 'start-dream-skin.ps1'
 $injector = Join-Path $PSScriptRoot 'injector.mjs'
 $setTheme = Join-Path $PSScriptRoot 'set-theme.mjs'
 
-Write-Host '[1/4] Checking Codex and AutoSkin status...' -ForegroundColor Cyan
+Write-Host '[1/4] Checking Codex and Meteor Skin status...' -ForegroundColor Cyan
 $running = @(Get-Process ChatGPT -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 })
 if (-not (Test-DreamDebugPort $Port) -and $running.Count -gt 0 -and -not $RestartExisting) {
-  $answer = Read-Host 'Codex is open without AutoSkin. Restart Codex now? [y/N]'
+  $answer = Read-Host 'Codex is open without Meteor Skin. Restart Codex now? [y/N]'
   if ($answer -notmatch '^(y|yes)$') {
     throw 'Activation cancelled; Codex was left open and unchanged.'
   }
   $RestartExisting = $true
 }
 
-Write-Host '[2/4] Starting or hot-reloading AutoSkin...' -ForegroundColor Cyan
+Write-Host '[2/4] Starting or hot-reloading Meteor Skin...' -ForegroundColor Cyan
 $startArgs = @{ Port = $Port }
 if ($RestartExisting) { $startArgs.RestartExisting = $true }
 & $start @startArgs
@@ -37,5 +37,5 @@ if ($Theme) {
 
 Write-Host '[4/4] Verifying the live skin...' -ForegroundColor Cyan
 & $node $injector --verify --port $Port --timeout-ms 12000 | Out-Null
-if ($LASTEXITCODE -ne 0) { throw 'AutoSkin verification failed. Check the injector logs in LOCALAPPDATA\CodexDreamSkin.' }
-Write-Host "Codex AutoSkin is active on port $Port." -ForegroundColor Green
+if ($LASTEXITCODE -ne 0) { throw 'Meteor Skin verification failed. Check the injector logs in LOCALAPPDATA\CodexDreamSkin.' }
+Write-Host "Meteor Skin is active on port $Port." -ForegroundColor Green
