@@ -38,7 +38,7 @@ if [ -f "$WATCHER_STATE_PATH" ]; then
   [ -z "$WATCHER_PID" ] || dream_stop_pid_if_matches "$WATCHER_PID" "watch-dream-skin.sh"
   rm -f "$WATCHER_STATE_PATH"
 fi
-rm -rf "$STATE_ROOT/watcher.lock"
+rmdir "$STATE_ROOT/watcher.lock" 2>/dev/null || true
 
 if [ -f "$STATE_PATH" ]; then
   INJECTOR_PID="$(dream_read_json_number "$STATE_PATH" injectorPid 2>/dev/null || true)"
@@ -65,7 +65,11 @@ fi
 
 if [ "$UNINSTALL" -eq 1 ]; then
   rm -f "$STATE_ROOT/install-state.json"
-  rm -rf "$STATE_ROOT/runtime"
+  if [ -d "$STATE_ROOT/runtime" ]; then
+    RUNTIME_ARCHIVE="$STATE_ROOT/runtime.uninstalled-$(date -u '+%Y%m%dT%H%M%SZ')-$$"
+    mv "$STATE_ROOT/runtime" "$RUNTIME_ARCHIVE"
+    echo "Archived the installed runtime for recovery: $RUNTIME_ARCHIVE"
+  fi
 fi
 
 echo "The live Dream Skin was removed."

@@ -9,7 +9,7 @@
   const INJECTION_ID = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const LAYOUT_STORAGE_KEY = "codex-dream-skin.layout";
   const THEME_STORAGE_KEY = "codex-dream-skin.theme";
-  const STYLE_VERSION = "4";
+  const STYLE_VERSION = "5";
   const LAYOUTS = new Set(["banner", "fullscreen"]);
   // Sidebar "new task" row gets a marker class so the structure CSS can restyle
   // it as a capsule. Text matching only; the real button stays fully native.
@@ -19,6 +19,7 @@
   const THEME_ORDER = manifest.order;
   const THEMES = new Set(THEME_ORDER);
   const THEME_META = manifest.meta;
+  const THEME_MODE_META = manifest.modeMeta ?? {};
   const THEME_STICKERS = manifest.stickers ?? {};
   const DEFAULT_THEME = THEMES.has(manifest.defaultTheme) ? manifest.defaultTheme : THEME_ORDER[0];
   const DEFAULT_LAYOUT = LAYOUTS.has(manifest.defaultLayout) ? manifest.defaultLayout : "fullscreen";
@@ -86,8 +87,11 @@
   };
   let activeTheme = readTheme();
 
+  const readAppearance = () => document.documentElement?.classList.contains("electron-dark") ? "dark" : "light";
+
   const syncThemeMeta = () => {
-    const meta = THEME_META[activeTheme];
+    const baseMeta = THEME_META[activeTheme];
+    const meta = { ...baseMeta, ...(THEME_MODE_META[activeTheme]?.[readAppearance()] ?? {}) };
     const chrome = document.getElementById(CHROME_ID);
     const brand = chrome?.querySelector(".dream-brand b");
     const edition = chrome?.querySelector(".dream-brand small");
@@ -181,6 +185,17 @@
     }
     if (home) home.classList.add("dream-home");
 
+    const settingsRoute = Boolean(document.querySelector('nav[aria-label="设置"], nav[aria-label="Settings"]'));
+    document.body?.classList.toggle("dream-settings-route", settingsRoute);
+    for (const node of document.querySelectorAll(".dream-dialog-surface")) {
+      if (node.getAttribute("role") !== "dialog" && node.tagName !== "DIALOG") node.classList.remove("dream-dialog-surface");
+    }
+    document.querySelectorAll('[role="dialog"], dialog').forEach((node) => node.classList.add("dream-dialog-surface"));
+    for (const node of document.querySelectorAll(".dream-popover-surface")) {
+      if (!["menu", "listbox"].includes(node.getAttribute("role"))) node.classList.remove("dream-popover-surface");
+    }
+    document.querySelectorAll('[role="menu"], [role="listbox"]').forEach((node) => node.classList.add("dream-popover-surface"));
+
     if (!shellMain || !document.body) return;
     shellMain.classList.toggle("dream-home-shell", Boolean(home));
     document.getElementById(LEGACY_CONTROLS_ID)?.remove();
@@ -263,6 +278,9 @@
     document.querySelectorAll(".dream-home").forEach((node) => node.classList.remove("dream-home"));
     document.querySelectorAll(".dream-home-shell").forEach((node) => node.classList.remove("dream-home-shell"));
     document.querySelectorAll(".dream-new-task").forEach((node) => node.classList.remove("dream-new-task"));
+    document.querySelectorAll(".dream-dialog-surface").forEach((node) => node.classList.remove("dream-dialog-surface"));
+    document.querySelectorAll(".dream-popover-surface").forEach((node) => node.classList.remove("dream-popover-surface"));
+    document.body?.classList.remove("dream-settings-route");
     document.getElementById(STYLE_ID)?.remove();
     document.getElementById(CHROME_ID)?.remove();
     document.getElementById(LEGACY_CONTROLS_ID)?.remove();
@@ -287,7 +305,12 @@
     }, 180);
   };
   const observer = new MutationObserver(scheduleEnsure);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["class"],
+  });
   const timer = setInterval(ensure, 5000);
   window[STATE_KEY] = {
     ensure,
@@ -304,8 +327,9 @@
     setLayout: applyLayout,
     get theme() { return activeTheme; },
     setTheme: applyTheme,
-    version: "2.2.0"
+    get appearance() { return readAppearance(); },
+    version: "2.3.0"
   };
   ensure();
-  return { installed: true, version: "2.2.0", layout: activeLayout, theme: activeTheme, themes: [...THEME_ORDER] };
+  return { installed: true, version: "2.3.0", layout: activeLayout, theme: activeTheme, appearance: readAppearance(), themes: [...THEME_ORDER] };
 })(__DREAM_CSS_JSON__, __DREAM_ART_ASSETS_JSON__, __DREAM_MANIFEST_JSON__)

@@ -5,7 +5,7 @@
    themes/<name>/theme.json and themes-private/<name>/theme.json. */
 
 :root.codex-dream-skin {
-  color-scheme: light !important;
+  color-scheme: light dark !important;
   /* Structural layout tokens (theme-independent; a theme may override them). */
   --dream-hero-copy-width: 54%;
   --dream-hero-split-width: 58%;
@@ -13,6 +13,11 @@
   --dream-card-height: clamp(148px, 19cqh, 192px);
   --dream-suggestion-gap: 13px;
   --dream-fullscreen-overlay-width: 76%;
+  --dream-fullscreen-inset: 14px 16px 16px;
+  --dream-fullscreen-inset-narrow: 10px 10px 12px;
+  --dream-fullscreen-radius: 28px;
+  --dream-card-blur: 15px;
+  --dream-card-saturation: 1;
   /* v1.1 decor tokens. All optional: a v1.0 theme.json keeps working untouched.
      --dream-card-sub-1..4 and --dream-composer-placeholder are usually generated
      by the injector from the theme.json "cards"/"composer" fields. */
@@ -71,14 +76,31 @@
   --dream-chat-art-position: center;
   --dream-chat-art-opacity: .10;
   --dream-chat-wash: rgba(255, 255, 255, .76);
+  /* v2.3 semantic native-surface tokens. Adaptive themes override these in
+     modes.light / modes.dark; single-mode themes keep the light fallbacks. */
+  --dream-native-text-primary: var(--dream-ink);
+  --dream-native-text-secondary: color-mix(in srgb, var(--dream-ink) 72%, transparent);
+  --dream-native-text-tertiary: color-mix(in srgb, var(--dream-ink) 54%, transparent);
+  --dream-native-link: var(--dream-purple);
+  --dream-native-sidebar-bg: linear-gradient(180deg, rgba(255,250,253,.98), rgba(255,239,248,.96));
+  --dream-native-main-bg: linear-gradient(180deg, var(--dream-page-bg-0), var(--dream-page-bg-1));
+  --dream-native-elevated-bg: rgba(255, 252, 253, .96);
+  --dream-native-input-bg: rgba(255, 248, 252, .94);
+  --dream-native-header-bg: linear-gradient(90deg, rgba(255,249,252,.95), rgba(255,227,243,.84), rgba(229,207,255,.78));
+  --dream-native-hover-bg: linear-gradient(90deg, rgba(255,211,235,.72), rgba(221,194,255,.62));
+  --dream-native-border: rgba(229, 151, 198, .45);
+  --dream-native-border-strong: rgba(193, 101, 191, .34);
 }
+
+:root.codex-dream-skin.electron-light { color-scheme: light !important; }
+:root.codex-dream-skin.electron-dark { color-scheme: dark !important; }
 
 html.codex-dream-skin body {
   background:
     radial-gradient(circle at 78% 2%, var(--dream-page-glow-a), transparent 25%),
     radial-gradient(circle at 24% 12%, var(--dream-page-glow-b), transparent 28%),
     linear-gradient(135deg, var(--dream-page-bg-0) 0%, var(--dream-page-bg-1) 100%) !important;
-  color: var(--dream-ink) !important;
+  color: var(--dream-native-text-primary) !important;
   font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif !important;
 }
 
@@ -97,14 +119,13 @@ html.codex-dream-skin body::before {
 }
 
 html.codex-dream-skin aside.app-shell-left-panel {
-  background:
-    linear-gradient(180deg, rgba(255,250,253,.98), rgba(255,239,248,.96)) !important;
-  border: 1px solid rgba(229, 151, 198, .45) !important;
+  background: var(--dream-native-sidebar-bg) !important;
+  border: 1px solid var(--dream-native-border) !important;
   border-left: 0 !important;
   border-radius: 0 20px 20px 0 !important;
   box-shadow: 10px 0 32px rgba(142, 55, 147, .10), inset -1px 0 rgba(255,255,255,.9) !important;
   backdrop-filter: none !important;
-  color: var(--dream-ink) !important;
+  color: var(--dream-native-text-primary) !important;
 }
 
 html.codex-dream-skin aside.app-shell-left-panel nav {
@@ -112,12 +133,12 @@ html.codex-dream-skin aside.app-shell-left-panel nav {
 }
 
 html.codex-dream-skin aside.app-shell-left-panel button {
-  color: #55266e !important;
+  color: var(--dream-native-text-primary) !important;
   transition: transform .16s ease, background .16s ease, box-shadow .16s ease !important;
 }
 
 html.codex-dream-skin aside.app-shell-left-panel button:hover {
-  background: linear-gradient(90deg, rgba(255,211,235,.72), rgba(221,194,255,.62)) !important;
+  background: var(--dream-native-hover-bg) !important;
   box-shadow: inset 0 0 0 1px rgba(207,110,190,.22) !important;
   transform: translateX(1px);
 }
@@ -233,7 +254,7 @@ html.codex-dream-skin main.main-surface {
     radial-gradient(circle at 84% 10%, var(--dream-page-glow-a), transparent 30%),
     radial-gradient(circle at 20% 0%, var(--dream-page-glow-b), transparent 26%),
     linear-gradient(180deg, var(--dream-page-bg-0) 0%, var(--dream-page-bg-1) 100%) !important;
-  border: 1px solid rgba(232, 166, 208, .45) !important;
+  border: 1px solid var(--dream-native-border) !important;
   border-right: 0 !important;
   border-bottom: 0 !important;
   border-radius: 20px 0 0 0 !important;
@@ -269,9 +290,9 @@ html.codex-dream-skin main.main-surface > * {
 }
 
 html.codex-dream-skin main.main-surface > header.app-header-tint {
-  background:
-    linear-gradient(90deg, rgba(255,249,252,.95), rgba(255,227,243,.84), rgba(229,207,255,.78)) !important;
-  border-bottom: 1px solid rgba(229,151,198,.34) !important;
+  color: var(--dream-native-text-primary) !important;
+  background: var(--dream-native-header-bg) !important;
+  border-bottom: 1px solid var(--dream-native-border-strong) !important;
   backdrop-filter: none !important;
 }
 
@@ -858,13 +879,13 @@ html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child {
 
 html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child > div:first-child {
   position: absolute !important;
-  inset: 14px 16px 16px !important;
+  inset: var(--dream-fullscreen-inset) !important;
   width: auto !important;
   height: auto !important;
   min-height: 0 !important;
   overflow: hidden !important;
   border-color: rgba(255, 218, 238, .86) !important;
-  border-radius: 28px !important;
+  border-radius: var(--dream-fullscreen-radius) !important;
   background-size: 100% 100%, var(--dream-fullscreen-art-size) !important;
   background-position: center, var(--dream-fullscreen-art-position) !important;
   box-shadow: 0 18px 42px rgba(72, 20, 91, .34), inset 0 0 0 4px rgba(255, 255, 255, .18) !important;
@@ -874,7 +895,7 @@ html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child > d
   /* Width 100% + a radial/vertical gradient in --dream-fullscreen-overlay turns
      this into the "scene" preset for full-canvas art (see THEME-SPEC.md §5.1). */
   width: var(--dream-fullscreen-overlay-width);
-  border-radius: 26px 0 0 26px;
+  border-radius: calc(var(--dream-fullscreen-radius) - 2px) 0 0 calc(var(--dream-fullscreen-radius) - 2px);
   background: var(--dream-fullscreen-overlay);
 }
 
@@ -884,7 +905,7 @@ html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child > d
   z-index: 0;
   inset: 0;
   pointer-events: none;
-  border-radius: 26px;
+  border-radius: calc(var(--dream-fullscreen-radius) - 2px);
   background: var(--dream-fullscreen-wash);
 }
 
@@ -922,7 +943,8 @@ html.dream-layout-fullscreen .dream-home .group\/home-suggestions button {
     radial-gradient(circle at 50% 16%, rgba(255, 255, 255, .42), transparent 44%),
     linear-gradient(160deg, rgb(255 250 252 / var(--dream-card-alpha)), rgb(255 230 244 / calc(var(--dream-card-alpha) * .94))) !important;
   box-shadow: 0 12px 28px rgba(58, 17, 85, .25), inset 0 0 0 2px rgba(255, 255, 255, .36) !important;
-  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(var(--dream-card-blur)) saturate(var(--dream-card-saturation));
+  backdrop-filter: blur(var(--dream-card-blur)) saturate(var(--dream-card-saturation));
 }
 
 html.dream-layout-fullscreen .dream-home > div:first-child > div:nth-child(2) {
@@ -1057,6 +1079,51 @@ html.codex-dream-skin [data-message-author-role] {
   border-radius: 20px;
 }
 
+/* v2.3 native route surfaces. The renderer adds stable Dream Skin markers so
+   themes do not need language-specific or hashed selectors for every view. */
+html.codex-dream-skin .dream-dialog-surface,
+html.codex-dream-skin .dream-popover-surface {
+  color: var(--dream-native-text-primary) !important;
+  background: var(--dream-native-elevated-bg) !important;
+  border-color: var(--dream-native-border) !important;
+}
+
+html.codex-dream-skin .dream-dialog-surface p,
+html.codex-dream-skin .dream-dialog-surface li,
+html.codex-dream-skin .dream-dialog-surface [class*="text-token-text-secondary"],
+html.codex-dream-skin .dream-popover-surface [class*="text-token-text-secondary"] {
+  color: var(--dream-native-text-secondary) !important;
+}
+
+html.codex-dream-skin .dream-dialog-surface a,
+html.codex-dream-skin .dream-popover-surface a,
+html.codex-dream-skin body.dream-settings-route .main-surface a {
+  color: var(--dream-native-link) !important;
+}
+
+html.codex-dream-skin body.dream-settings-route .main-surface,
+html.codex-dream-skin body.dream-settings-route .app-shell-left-panel,
+html.codex-dream-skin body.dream-settings-route nav {
+  color: var(--dream-native-text-primary) !important;
+}
+
+html.codex-dream-skin body.dream-settings-route input,
+html.codex-dream-skin body.dream-settings-route [role="searchbox"],
+html.codex-dream-skin body.dream-settings-route button[class*="bg-token-bg-fog"],
+html.codex-dream-skin body.dream-settings-route .rounded-2xl.border-token-border {
+  color: var(--dream-native-text-primary) !important;
+  background: var(--dream-native-input-bg) !important;
+  border-color: var(--dream-native-border) !important;
+}
+
+html.codex-dream-skin body.dream-settings-route [class*="text-token-text-secondary"] {
+  color: var(--dream-native-text-secondary) !important;
+}
+
+html.codex-dream-skin body.dream-settings-route [class*="text-token-text-tertiary"] {
+  color: var(--dream-native-text-tertiary) !important;
+}
+
 @media (max-width: 1400px) {
   .dream-polaroid { display: none !important; }
   #codex-dream-skin-chrome .dream-sticker { display: none !important; }
@@ -1093,7 +1160,7 @@ html.codex-dream-skin [data-message-author-role] {
     top: calc(100% + clamp(58px, 12cqh, 94px)) !important;
   }
   html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child > div:first-child {
-    inset: 10px 10px 12px !important;
+    inset: var(--dream-fullscreen-inset-narrow) !important;
   }
   html.dream-layout-fullscreen .dream-home > div:first-child > div:first-child > div:first-child > div:first-child {
     padding: 64px 0 0 26px !important;

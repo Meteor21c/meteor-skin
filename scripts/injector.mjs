@@ -185,6 +185,7 @@ const REQUIRED_TOKENS = [
   "--dream-chat-wash",
 ];
 const REQUIRED_META = ["button", "brand", "edition", "signature"];
+const APPEARANCE_MODES = ["light", "dark"];
 // v1.1 optional decor fields (cards / stickers / composer). They are pure sugar:
 // a theme.json without them must behave exactly like v1.0, and an invalid value
 // only drops that field with a warning — it never rejects the theme.
@@ -373,7 +374,7 @@ function validateExtraCssScope(css, themeName) {
   return errors;
 }
 
-function validateTokens(name, tokens) {
+function validateTokens(name, tokens, { requireAll = true } = {}) {
   if (!tokens || typeof tokens !== "object" || Array.isArray(tokens)) {
     return { errors: [`theme "${name}": "tokens" must be an object`] };
   }
@@ -386,10 +387,59 @@ function validateTokens(name, tokens) {
       errors.push(`theme "${name}": token "${key}" contains forbidden characters`);
     }
   }
-  for (const key of REQUIRED_TOKENS) {
-    if (!(key in tokens)) errors.push(`theme "${name}": missing required token "${key}"`);
+  if (requireAll) {
+    for (const key of REQUIRED_TOKENS) {
+      if (!(key in tokens)) errors.push(`theme "${name}": missing required token "${key}"`);
+    }
   }
   return { errors };
+}
+
+function normalizeAppearanceModes(name, config) {
+  if (config.modes === undefined) return {};
+  if (!config.modes || typeof config.modes !== "object" || Array.isArray(config.modes)) {
+    warn(`theme "${name}": "modes" must be an object; adaptive overrides ignored`);
+    return {};
+  }
+  const normalized = {};
+  for (const mode of APPEARANCE_MODES) {
+    const modeConfig = config.modes[mode];
+    if (modeConfig === undefined) continue;
+    if (!modeConfig || typeof modeConfig !== "object" || Array.isArray(modeConfig)) {
+      warn(`theme "${name}": modes.${mode} must be an object; mode ignored`);
+      continue;
+    }
+    const modeTokens = modeConfig.tokens ?? {};
+    const { errors } = validateTokens(`${name}/${mode}`, modeTokens, { requireAll: false });
+    if (errors.length) {
+      for (const error of errors) warn(error);
+      warn(`theme "${name}": modes.${mode} ignored because of invalid tokens`);
+      continue;
+    }
+    const modeMeta = {};
+    if (modeConfig.meta !== undefined) {
+      if (!modeConfig.meta || typeof modeConfig.meta !== "object" || Array.isArray(modeConfig.meta)) {
+        warn(`theme "${name}": modes.${mode}.meta must be an object; meta ignored`);
+      } else {
+        for (const key of REQUIRED_META) {
+          if (modeConfig.meta[key] === undefined) continue;
+          if (typeof modeConfig.meta[key] !== "string" || !modeConfig.meta[key].trim()) {
+            warn(`theme "${name}": modes.${mode}.meta.${key} must be a non-empty string; value ignored`);
+          } else {
+            modeMeta[key] = modeConfig.meta[key].trim();
+          }
+        }
+      }
+    }
+    normalized[mode] = {
+      tokens: { ...deriveDecorTokens(`${name}/${mode}`, modeConfig), ...modeTokens },
+      meta: modeMeta,
+    };
+  }
+  for (const key of Object.keys(config.modes)) {
+    if (!APPEARANCE_MODES.includes(key)) warn(`theme "${name}": unknown appearance mode "${key}" ignored`);
+  }
+  return normalized;
 }
 
 async function loadThemeDir(baseName, dirName) {
@@ -463,6 +513,7 @@ async function loadThemeDir(baseName, dirName) {
       extraCss = null;
     }
   }
+  const modes = normalizeAppearanceModes(name, config);
   return {
     name,
     source: baseName,
@@ -476,6 +527,7 @@ async function loadThemeDir(baseName, dirName) {
     },
     // Derived decor tokens first so hand-written tokens of the same name win.
     tokens: { ...deriveDecorTokens(name, config), ...config.tokens },
+    modes,
     stickers: normalizeStickers(name, config.stickers),
     extraCss,
     artUrls,
@@ -514,6 +566,13 @@ function buildThemeCss(themes) {
   for (const theme of themes) {
     const lines = Object.entries(theme.tokens).map(([key, value]) => `  ${key}: ${value};`);
     blocks.push(`:root.codex-dream-skin.dream-theme-${theme.name} {\n${lines.join("\n")}\n}`);
+    for (const mode of APPEARANCE_MODES) {
+      const modeTokens = theme.modes[mode]?.tokens ?? {};
+      const modeLines = Object.entries(modeTokens).map(([key, value]) => `  ${key}: ${value};`);
+      if (modeLines.length) {
+        blocks.push(`:root.codex-dream-skin.dream-theme-${theme.name}.electron-${mode} {\n${modeLines.join("\n")}\n}`);
+      }
+    }
   }
   for (const theme of themes) {
     if (theme.extraCss) {
@@ -534,6 +593,11 @@ async function loadPayload() {
   const manifest = {
     order: themes.map((theme) => theme.name),
     meta: Object.fromEntries(themes.map((theme) => [theme.name, theme.meta])),
+    modeMeta: Object.fromEntries(themes.map((theme) => [theme.name,
+      Object.fromEntries(APPEARANCE_MODES
+        .filter((mode) => Object.keys(theme.modes[mode]?.meta ?? {}).length)
+        .map((mode) => [mode, theme.modes[mode].meta]))
+    ])),
     stickers: Object.fromEntries(themes.map((theme) => [theme.name, theme.stickers])),
     defaultTheme,
     defaultLayout: DEFAULT_LAYOUT,
@@ -571,6 +635,9 @@ async function removeFromSession(session) {
     document.querySelectorAll('.dream-home').forEach((node) => node.classList.remove('dream-home'));
     document.querySelectorAll('.dream-home-shell').forEach((node) => node.classList.remove('dream-home-shell'));
     document.querySelectorAll('.dream-new-task').forEach((node) => node.classList.remove('dream-new-task'));
+    document.querySelectorAll('.dream-dialog-surface').forEach((node) => node.classList.remove('dream-dialog-surface'));
+    document.querySelectorAll('.dream-popover-surface').forEach((node) => node.classList.remove('dream-popover-surface'));
+    document.body?.classList.remove('dream-settings-route');
     document.getElementById('codex-dream-skin-style')?.remove();
     document.getElementById('codex-dream-skin-chrome')?.remove();
     document.getElementById('codex-dream-skin-controls')?.remove();
@@ -618,6 +685,7 @@ async function verifySession(session) {
       installed: document.documentElement.classList.contains('codex-dream-skin'),
       version: state?.version ?? null,
       theme: state?.theme ?? null,
+      appearance: state?.appearance ?? (document.documentElement.classList.contains('electron-dark') ? 'dark' : 'light'),
       layout: state?.layout ?? null,
       themes: state?.themes ?? null,
       stylePresent: Boolean(document.getElementById('codex-dream-skin-style')),
@@ -744,6 +812,9 @@ async function runThemesReport() {
       default: theme.isDefault,
       button: theme.meta.button,
       extraCss: theme.extraCss !== null,
+      appearance: Object.keys(theme.modes).length === 2
+        ? "adaptive"
+        : (Object.keys(theme.modes)[0] ?? "single"),
       stickers: theme.stickers ? Object.keys(theme.stickers) : [],
     })),
   }, null, 2));

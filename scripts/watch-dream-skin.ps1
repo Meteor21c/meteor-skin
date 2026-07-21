@@ -5,9 +5,7 @@ param(
   [int]$LaunchGraceSeconds = 15,
   [int]$MaxConsecutiveFailures = 3,
   [int]$CooldownMinutes = 30,
-  [int]$ProbeFailuresBeforeRecovery = 3,
-  [int]$MaxRestartsPerWindow = 2,
-  [int]$RestartWindowMinutes = 10
+  [int]$ProbeFailuresBeforeRecovery = 3
 )
 
 $ErrorActionPreference = 'Continue'
@@ -63,7 +61,6 @@ Write-WatcherLog "Watcher started (PID $PID, port $Port)."
 $consecutiveFailures = 0
 $suspendedUntil = $null
 $missedProbes = 0
-$restartTimes = New-Object System.Collections.Generic.List[datetime]
 
 try {
   while ($true) {
@@ -124,33 +121,13 @@ try {
       }
       $missedProbes = 0
 
-      # Rate limit: even "successful" recoveries must not loop. If we already restarted
-      # Codex $MaxRestartsPerWindow times inside the window, something is systemically
-      # wrong — suspend instead of restarting again.
-      while ($restartTimes.Count -gt 0 -and $restartTimes[0] -lt (Get-Date).AddMinutes(-$RestartWindowMinutes)) {
-        $restartTimes.RemoveAt(0)
-      }
-      if ($restartTimes.Count -ge $MaxRestartsPerWindow) {
-        $suspendedUntil = (Get-Date).AddMinutes($CooldownMinutes)
-        Write-WatcherLog "Restart rate limit hit ($($restartTimes.Count) restarts within $RestartWindowMinutes minutes); auto-recovery suspended until $($suspendedUntil.ToString('yyyy-MM-dd HH:mm:ss')). Codex keeps running; run start-dream-skin.ps1 manually if the skin is missing."
-        Start-Sleep -Seconds ([Math]::Max(1, $PollSeconds))
-        continue
-      }
-
-      Write-WatcherLog 'Detected Codex launched without Dream Skin; restarting it through the skin launcher.'
-      $restartTimes.Add((Get-Date))
-      try {
-        & $StartScript -Port $Port -RestartExisting | Out-Null
-        if (Test-DreamDebugPort) {
-          Write-WatcherLog 'Codex restarted with Dream Skin.'
-        } else {
-          $failed = $true
-          $failureReason = 'the launcher finished but CDP is still unreachable on both loopbacks'
-        }
-      } catch {
-        $failed = $true
-        $failureReason = $_.Exception.Message
-      }
+      # A running Electron app cannot gain a remote-debugging port in-place. Never
+      # terminate the user's Codex from a background watcher. The explicit launcher
+      # can ask for consent and then restart if the user wants the skin immediately.
+      $suspendedUntil = (Get-Date).AddMinutes($CooldownMinutes)
+      Write-WatcherLog "Codex is running without the Dream Skin debug port. No restart was attempted. Use the Codex Dream Skin shortcut to activate it; watcher checks resume after $($suspendedUntil.ToString('yyyy-MM-dd HH:mm:ss'))."
+      Start-Sleep -Seconds ([Math]::Max(1, $PollSeconds))
+      continue
     }
 
     if ($failed) {

@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078d4)
 ![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933)
-![Release](https://img.shields.io/github/v/release/Finderchangchang/codex-autoskin)
+![Version](https://img.shields.io/badge/version-2.3.0-7c3aed)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 Two minutes to first light · No official files touched · One-command restore · Windows & macOS
@@ -19,6 +19,12 @@ Two minutes to first light · No official files touched · One-command restore �
 </div>
 
 ---
+
+> **Derivative fork notice:** this public fork is maintained by
+> [@Meteor21c](https://github.com/Meteor21c) and preserves the original
+> [Finderchangchang/codex-autoskin](https://github.com/Finderchangchang/codex-autoskin)
+> history and MIT attribution. See [NOTICE.md](NOTICE.md) for the complete
+> provenance, modification, AI-assistance, asset-rights, and trademark notice.
 
 ## 🎬 Live demo
 
@@ -43,7 +49,7 @@ Done — from a single image to a custom skin, hands-free:
 Send this line to your Codex, with an image you like attached (landscape, subject on the right, no text/watermark):
 
 ```text
-Install this Codex skin engine: https://github.com/Finderchangchang/codex-autoskin , then use the attached image to generate a theme and apply it
+Install this Codex skin engine: https://github.com/Meteor21c/codex-autoskin , then use the attached image to generate a theme and apply it
 ```
 
 The rest is automatic. No image? It still lights up with a bundled theme first — add yours anytime. Don't want to use AI? See the manual per-platform steps below.
@@ -72,16 +78,16 @@ The rest is automatic. No image? It still lights up with a bundled theme first �
 - 📁 **A theme is a folder** — one `theme.json` + one image is a theme; add or remove themes with zero code changes
 - 🤖 **Optional AI refinement** — hand the repo to your Codex / Claude and deeply customize crop, copy, and stickers via [THEME-SPEC.md](THEME-SPEC.md)
 - 🔒 **Safe & reversible** — CDP injection on loopback only; never touches `WindowsApps`, the app bundle, or `app.asar`; login/session preserved; one command to restore
-- 🛡 **Battle-tested guard** — dual-stack port probing, crash debounce + circuit breaker, decoration hit-testing; a Startup watcher on Windows / a LaunchAgent on macOS re-applies the skin after Codex restarts
+- 🛡 **Consent-first guard** — dual-stack probing, debounce, circuit breaker, and decoration hit-testing; the Windows Startup watcher / macOS LaunchAgent repairs the injector when CDP is already available and never restarts Codex without consent
 
 ## 🚀 Quick start
 
 ### Windows: two commands
 
-Requires Windows 10/11, Microsoft Store Codex (opened and signed in once), and [Node.js ≥ 20](https://nodejs.org/).
+Requires Windows 10/11 and Microsoft Store Codex (opened and signed in once). The installer prefers a compatible Node.js runtime bundled with Codex and otherwise uses a system [Node.js ≥ 20](https://nodejs.org/).
 
 ```powershell
-git clone https://github.com/Finderchangchang/codex-autoskin.git   # or Download ZIP and extract
+git clone https://github.com/Meteor21c/codex-autoskin.git   # or Download ZIP and extract
 cd codex-autoskin
 
 .\quickstart.ps1                              # ① install & launch — Codex lights up with a bundled theme
@@ -174,7 +180,7 @@ It launches the official Codex (`ChatGPT.exe` on Windows / `ChatGPT.app` on macO
 - Never replaces, patches, or re-signs any official file or app bundle; login / session / plugins stay untouched
 - The platform `restore-dream-skin` script removes all injected content live; for a full uninstall add `-Uninstall -RestoreBaseTheme` (Windows) or `--uninstall --restore-base-theme` (macOS, safe to repeat)
 - All runtime state lives under `%LOCALAPPDATA%\CodexDreamSkin` / `~/Library/Application Support/CodexDreamSkin`; delete it and no trace remains
-- A hidden watcher re-applies the skin after a normal Codex restart (debounce + rate limit + failure cooldown, never fighting the app); the macOS LaunchAgent never interrupts a Codex that was already open
+- A hidden watcher repairs a missing injector only when Codex already exposes CDP; it never closes or restarts an open app. The activation entry asks before the one restart required for an unskinned running instance
 - Auxiliary renderers (desktop pets, etc.) are never injected and stay transparent
 
 > The scripts and internal identifiers keep the `dream` prefix — that's the default style-pack name, and a nod to the original.
@@ -230,10 +236,10 @@ The whole 2.0 was pair-programmed with AI — the full decision log, including e
 
 ## ⚠️ Disclaimer
 
-- A decorative community project, **not affiliated with OpenAI**; Codex and related marks belong to their respective owners.
+- A decorative community project, **not affiliated with or endorsed by OpenAI**; Codex and related marks belong to their respective owners and must be used under the current [OpenAI brand guidelines](https://openai.com/brand/).
 - Codex desktop updates may change internal structure and require re-adaptation (the engine targets semantic selectors, so minor updates are usually seamless).
 - You are responsible for the copyright and likeness rights of art in your own themes; never use another person's likeness to build and publicly distribute a theme — keep private themes in the git-ignored `themes-private/`.
 
 ## 📄 License
 
-[MIT](LICENSE) © Vikicc
+[MIT](LICENSE) © 2026 Vikicc for the upstream work. Modifications are maintained by [@Meteor21c](https://github.com/Meteor21c) under the same license to the extent applicable. See [NOTICE.md](NOTICE.md) for complete attribution and licensing boundaries.

@@ -37,12 +37,12 @@ Windows 与 macOS 的启动、安装、验证、恢复和 watcher 闭环都已�
 - macOS：POSIX shell 脚本、`ChatGPT.app` / `Codex.app` bundle 发现、LaunchAgent watcher、`~/Library/Application Support/CodexDreamSkin`；
 - 跨平台：`scripts/injector.mjs`、`scripts/set-theme.mjs`、`assets/renderer-inject.js` 和主题 manifest。
 
-新增平台或修改 watcher 前建议先开 issue 对齐方案。必须保留 `references/runtime-notes.md` 中的双栈回环、防抖、重启限频和熔断语义。macOS 启动必须经过 LaunchServices；验证截图必须按原生窗口 ID 捕获，不能用会关闭当前 Codex macOS CDP socket 的 `Page.captureScreenshot`。
+新增平台或修改 watcher 前建议先开 issue 对齐方案。必须保留 `references/runtime-notes.md` 中的双栈回环、防抖、熔断和“后台 watcher 绝不关闭或重启 Codex”语义；只有交互式激活入口可在用户明确同意后重启。macOS 启动必须经过 LaunchServices；验证截图必须按原生窗口 ID 捕获，不能用会关闭当前 Codex macOS CDP socket 的 `Page.captureScreenshot`。
 
 ## 3. 引擎修复与增强
 
 - Codex 更新后的 DOM 适配、选择器修复；
-- watcher / 注入守护的健壮性改进（**必须保留防抖 + 熔断语义，绝不允许出现 kill-loop**，见 `references/runtime-notes.md`）;
+- watcher / 注入守护的健壮性改进（**必须保留防抖 + 熔断，并禁止后台关闭或重启 Codex**，见 `references/runtime-notes.md`）;
 - 新的可选装饰能力（照 v1.1/v1.2 的模式：theme.json 可选字段 + 缺省关闭 + 向后兼容 + 非法值只丢弃不连坐）。
 
 引擎 PR 请说明测试方式；动了注入/恢复路径的，跑一遍 `references/qa-inventory.md` 的签核清单。
@@ -54,5 +54,5 @@ Windows 与 macOS 的启动、安装、验证、恢复和 watcher 闭环都已�
 Three kinds of contributions are most welcome:
 
 1. **New themes** — a theme is a data folder under `themes/` (`theme.json` + one image); never modify engine files. Author it by handing this repo + your image to your own agent with [THEME-SPEC.md](THEME-SPEC.md). Acceptance = the QA checklist in THEME-SPEC.md §7. Attach screenshots of both layouts (blur your own sidebar/project names). Hard rules: **no real-person likeness**, no assets you can't redistribute, state the art's origin in `theme.json` `notes`, keep stickers neutral or off. Personal themes belong in the git-ignored `themes-private/`.
-2. **Platform support** — Windows and macOS are implemented. Keep platform launch/install/watch/restore code separate and the injection engine cross-platform. Open an issue before adding a platform; preserve all debounce/circuit-breaker guarantees in `references/runtime-notes.md`.
-3. **Engine fixes** — DOM re-adaptation after Codex updates, watcher robustness (the debounce + circuit-breaker semantics are non-negotiable), new opt-in decor fields following the v1.1/v1.2 pattern (optional, off by default, backward compatible). Run the signoff list in `references/qa-inventory.md` when touching inject/restore paths.
+2. **Platform support** — Windows and macOS are implemented. Keep platform launch/install/watch/restore code separate and the injection engine cross-platform. Open an issue before adding a platform; preserve the debounce/circuit-breaker guarantees and the rule that a background watcher never closes or restarts Codex. Only an interactive activator may restart after explicit consent.
+3. **Engine fixes** — DOM re-adaptation after Codex updates, watcher robustness (debounce, circuit breaker, and consent-first restart semantics are non-negotiable), new opt-in decor fields following the v1.1/v1.2 pattern (optional, off by default, backward compatible). Run the signoff list in `references/qa-inventory.md` when touching inject/restore paths.

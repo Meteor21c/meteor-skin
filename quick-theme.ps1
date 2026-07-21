@@ -284,10 +284,14 @@ $tokens['--dream-chat-art-opacity'] = $chatOpacity
 # ---------------------------------------------------------------------------
 Step "生成主题 themes\$Name"
 if (Test-Path -LiteralPath $themeDir) {
-  Get-ChildItem -LiteralPath $themeDir -Force | Remove-Item -Force -Recurse
-} else {
-  New-Item -ItemType Directory -Force -Path $themeDir | Out-Null
+  $archiveRoot = Join-Path $Root 'themes-archive'
+  New-Item -ItemType Directory -Force -Path $archiveRoot | Out-Null
+  $stamp = (Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ')
+  $archiveDir = Join-Path $archiveRoot "$Name-$stamp-$PID"
+  Move-Item -LiteralPath $themeDir -Destination $archiveDir
+  Note "旧主题已归档，可恢复：$archiveDir"
 }
+New-Item -ItemType Directory -Force -Path $themeDir | Out-Null
 if ($ext -eq '.png') { $artFile = 'art.png' } else { $artFile = 'art.jpg' }
 Copy-Item -LiteralPath $imgFull -Destination (Join-Path $themeDir $artFile) -Force
 

@@ -13,7 +13,7 @@
 
 ## 换图步骤
 
-1. **停 watcher**（防止它在注入器被杀时抢救）：Windows 从 `%LOCALAPPDATA%\CodexDreamSkin\watcher-state.json` 取 PID 后 `Stop-Process`；macOS 从 `~/Library/Application Support/CodexDreamSkin/watcher-state.json` 取 PID 后 `kill`。测完必须重启（见下）。
+1. **停 watcher**（避免测试期间自动补回注入器）：Windows 从 `%LOCALAPPDATA%\CodexDreamSkin\watcher-state.json` 取 PID 后 `Stop-Process`；macOS 从 `~/Library/Application Support/CodexDreamSkin/watcher-state.json` 取 PID 后 `kill`。测完必须重启（见下）。
 2. **停注入守护**：从平台状态目录的 `state.json` 取 injectorPid 后停止进程。守护持有旧 payload，不停它会在页面 reload 时回灌旧图。
 3. **备份旧图**：挪到平台状态目录下的 `retired-themes/<theme>-v1/art-v1.png`（不要留在主题文件夹里，避免误入仓库/payload）。
 4. **换图**：新图拷成 `themes*/<theme>/art.png`（保持 theme.json 的 art 文件名不变最省事）。
@@ -25,7 +25,7 @@
    `node tune.mjs --port 9335 --shot out.png --var "--dream-fullscreen-overlay=..." --var "--dream-card-alpha=.72"`
    每轮检查：标题/副标题对比度、主体（脸）无遮挡、卡片区可读、四角无异物。收敛后把终值写回 theme.json，`node tune.mjs --clear` 清 inline，再 `--once` 复核。
 8. **四个 crop 角色都要重调**：fullscreen（主画布）、hero（banner 横带）、polaroid（小竖卡）、chat（聊天淡背景，红线：消息文字绝对主导）。
-9. **回归**：全部主题 × 两版式截图；elementsFromPoint 命中账号按钮/四卡/输入框/发送键；restore 后 check-clean；重启 start 脚本恢复守护；**重启 watcher 并看日志无误杀**。
+9. **回归**：全部主题 × 两版式截图；elementsFromPoint 命中账号按钮/四卡/输入框/发送键；restore 后 check-clean；重启 start 脚本恢复守护；**重启 watcher 并确认它只修复注入器、不会关闭应用**。
 
 ## 本次最终参数（1672×941 场景图，写在 theme.json tokens 里）
 

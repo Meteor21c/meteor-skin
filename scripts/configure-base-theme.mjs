@@ -2,13 +2,14 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 function parseArgs(argv) {
-  const options = { mode: "apply", config: null, backup: null, platform: process.platform };
+  const options = { mode: "apply", config: null, backup: null, platform: process.platform, legacyBaseColors: false };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--config") options.config = path.resolve(argv[++index]);
     else if (arg === "--backup") options.backup = path.resolve(argv[++index]);
     else if (arg === "--platform") options.platform = argv[++index];
     else if (arg === "--restore") options.mode = "restore";
+    else if (arg === "--legacy-base-colors") options.legacyBaseColors = true;
     else throw new Error(`Unknown argument: ${arg}`);
   }
   if (!options.config || !options.backup) {
@@ -86,8 +87,12 @@ if (options.mode === "apply") {
   } catch (error) {
     if (error.code !== "EEXIST") throw error;
   }
-  await fs.writeFile(options.config, applySettings(config, options.platform), "utf8");
-  console.log(`Dream Skin base colors applied to ${options.config}`);
+  if (options.legacyBaseColors) {
+    await fs.writeFile(options.config, applySettings(config, options.platform), "utf8");
+    console.log(`Dream Skin legacy base colors applied to ${options.config}`);
+  } else {
+    console.log(`Codex appearance settings preserved in ${options.config}`);
+  }
 } else {
   const backup = await fs.readFile(options.backup, "utf8");
   await fs.writeFile(options.config, restoreSettings(config, backup), "utf8");

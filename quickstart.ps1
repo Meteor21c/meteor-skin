@@ -14,6 +14,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $Root = $PSScriptRoot
+. (Join-Path $Root 'scripts\lib\windows-common.ps1')
 
 function Step([string]$Message) { Write-Host "==> $Message" -ForegroundColor Cyan }
 function Ok([string]$Message) { Write-Host "    $Message" -ForegroundColor Green }
@@ -29,11 +30,8 @@ Write-Host ''
 # ---------------------------------------------------------------------------
 Step '1/4 环境自检'
 
-$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
-if (-not $nodeCmd) {
-  Fail '没找到 Node.js（需要 20 或更高版本）。去 https://nodejs.org/zh-cn 下载 LTS 安装包，装完重开 PowerShell 再运行本脚本。'
-}
-$nodeVersion = (& $nodeCmd.Source -v).Trim()
+$nodePath = Get-DreamNodePath
+$nodeVersion = (& $nodePath -v).Trim()
 $nodeMajor = 0
 if ($nodeVersion -match '^v(\d+)\.') { $nodeMajor = [int]$Matches[1] }
 if ($nodeMajor -lt 20) {
@@ -63,31 +61,32 @@ if (-not (Test-Path -LiteralPath $codexConfig)) {
 Ok 'Codex 配置文件就绪'
 
 # ---------------------------------------------------------------------------
-# 2/4 安装（写入配套官方浅色主题、快捷方式、自恢复守护）
+# 2/4 安装（保留官方外观设置、创建快捷方式和安全守护）
 # ---------------------------------------------------------------------------
 Step '2/4 安装换肤引擎'
 & (Join-Path $Root 'scripts\install-dream-skin.ps1') -Port $Port | Out-Null
 Ok '安装完成（重复运行也不会出错）'
 
 # ---------------------------------------------------------------------------
-# 3/4 启动带皮肤的 Codex（Codex 正开着的话会自动重启它一次）
+# 3/4 启动带皮肤的 Codex（若 Codex 正开着，会先询问是否重启）
 # ---------------------------------------------------------------------------
 Step '3/4 启动 Codex 并注入皮肤'
-& (Join-Path $Root 'scripts\start-dream-skin.ps1') -Port $Port -RestartExisting | Out-Null
+$runtimeRoot = Join-Path $env:LOCALAPPDATA 'CodexDreamSkin\runtime'
+& (Join-Path $runtimeRoot 'scripts\activate-dream-skin.ps1') -Port $Port | Out-Null
 Ok '皮肤已注入'
 
 # ---------------------------------------------------------------------------
 # 4/4 点亮默认主题
 # ---------------------------------------------------------------------------
 Step '4/4 应用默认主题'
-$setTheme = Join-Path $Root 'scripts\set-theme.mjs'
+$setTheme = Join-Path $runtimeRoot 'scripts\set-theme.mjs'
 $defaultTheme = $null
 try {
-  $list = (& $nodeCmd.Source $setTheme --list) | ConvertFrom-Json
+  $list = (& $nodePath $setTheme --list) | ConvertFrom-Json
   if ($list.ok) { $defaultTheme = $list.defaultTheme }
 } catch {}
 if (-not $defaultTheme) { $defaultTheme = 'aurora-veil' }
-& $nodeCmd.Source $setTheme $defaultTheme fullscreen | Out-Null
+& $nodePath $setTheme $defaultTheme fullscreen | Out-Null
 if ($LASTEXITCODE -ne 0) { Fail "皮肤在跑，但应用主题失败。手动试试：node scripts\set-theme.mjs $defaultTheme fullscreen" }
 Ok "当前主题：$defaultTheme（全屏版式）"
 

@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NODE_BIN="${NODE_BIN:-$(command -v node)}"
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/codex-autoskin-test.XXXXXX")"
-trap 'rm -rf "$TMP_ROOT"' EXIT
+echo "Test artifacts will be kept at: $TMP_ROOT"
 
 fail() {
   echo "macOS test failed: $*" >&2
@@ -44,11 +44,40 @@ THEME_REPORT="$TMP_ROOT/themes.json"
 "$NODE_BIN" "$ROOT/scripts/injector.mjs" --themes >"$THEME_REPORT"
 "$NODE_BIN" -e '
   const report = require(process.argv[1]);
-  if (report.defaultTheme !== "aurora-veil") throw new Error("unexpected default theme");
+  if (!report.themes.some((theme) => theme.name === report.defaultTheme)) throw new Error("default theme is not loadable");
   for (const name of ["aurora-veil", "ember-bloom"]) {
     if (!report.themes.some((theme) => theme.name === name)) throw new Error(`missing ${name}`);
   }
 ' "$THEME_REPORT"
+
+echo "Checking adaptive theme schema in an isolated fixture..."
+ADAPTIVE_ROOT="$TMP_ROOT/adaptive-skill"
+cp -R "$ROOT" "$ADAPTIVE_ROOT"
+mkdir -p "$ADAPTIVE_ROOT/themes-private/ci-adaptive"
+cp "$ROOT/themes/aurora-veil/art.png" "$ADAPTIVE_ROOT/themes-private/ci-adaptive/art.png"
+"$NODE_BIN" -e '
+  const fs = require("fs");
+  const path = require("path");
+  const [source, output] = process.argv.slice(1);
+  const theme = JSON.parse(fs.readFileSync(source, "utf8"));
+  theme.name = "ci-adaptive";
+  theme.order = 1;
+  theme.default = true;
+  theme.meta = { button: "CI", brand: "CI adaptive", edition: "test", signature: "CI" };
+  theme.modes = {
+    light: { tokens: { "--dream-native-text-primary": "#102030" } },
+    dark: { tokens: { "--dream-native-text-primary": "#e6f2ff" } }
+  };
+  fs.writeFileSync(output, `${JSON.stringify(theme, null, 2)}\n`);
+' "$ROOT/themes/aurora-veil/theme.json" "$ADAPTIVE_ROOT/themes-private/ci-adaptive/theme.json"
+ADAPTIVE_REPORT="$TMP_ROOT/adaptive-themes.json"
+"$NODE_BIN" "$ADAPTIVE_ROOT/scripts/injector.mjs" --themes >"$ADAPTIVE_REPORT"
+"$NODE_BIN" -e '
+  const report = require(process.argv[1]);
+  const adaptive = report.themes.find((theme) => theme.name === "ci-adaptive");
+  if (report.defaultTheme !== "ci-adaptive") throw new Error("adaptive fixture was not selected as default");
+  if (adaptive?.appearance !== "adaptive") throw new Error("adaptive theme was not reported correctly");
+' "$ADAPTIVE_REPORT"
 
 echo "Checking base-color apply/restore idempotence..."
 CONFIG_PATH="$TMP_ROOT/config.toml"
@@ -213,5 +242,10 @@ for _ in 1 2; do
 done
 [ ! -e "$TEST_HOME/Library/Application Support/CodexDreamSkin/runtime" ] || fail "runtime was not removed"
 [ ! -e "$TEST_HOME/Library/Application Support/CodexDreamSkin/install-state.json" ] || fail "install state was not removed"
+
+echo "Checking portable package staging and checksums..."
+PACKAGE_ROOT="$TMP_ROOT/Portable Package 中文路径"
+"$NODE_BIN" "$ROOT/scripts/build-share-package.mjs" --output "$PACKAGE_ROOT" >/dev/null
+"$NODE_BIN" "$ROOT/scripts/verify-share-package.mjs" --package "$PACKAGE_ROOT" >/dev/null
 
 echo "All macOS tests passed."

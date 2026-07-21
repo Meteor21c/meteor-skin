@@ -68,7 +68,20 @@ themes/<name>/            # 公开主题；本地私用放 themes-private/<name>
   "composer": {                 // 可选（v1.1）
     "placeholder": "输入你的想法…"   // 首页输入框占位文案；缺省保留 Codex 原生文案，
   },                            //   还原皮肤后自动恢复原生（走 CSS var 回退，无 DOM 改写）
-  "tokens": { ... }             // 必需：28 个 CSS 变量，见 §3。key 必须匹配 --dream-[a-z0-9-]+，
+  "modes": {                    // 可选（v2.3）：跟随 Codex 官方“外观”切换的增量覆盖
+    "light": {
+      "meta": { "brand": "Day Brand" }, // 四个 meta 字段都可按需覆盖
+      "cards": { "opacity": 0.28 },       // 也支持 cards/composer 的模式覆盖
+      "composer": { "placeholder": "在晴空下输入…" },
+      "tokens": { "--dream-page-bg-0": "#f7fbff" } // 只写与基础 tokens 不同的项
+    },
+    "dark": {
+      "meta": { "brand": "Night Brand" },
+      "cards": { "opacity": 0.34 },
+      "tokens": { "--dream-page-bg-0": "#071522" }
+    }
+  },
+  "tokens": { ... }             // 必需：28 个基础 CSS 变量，见 §3。key 必须匹配 --dream-[a-z0-9-]+，
                                 //   value 是不含 { } ; 的字符串；缺任何一个必需 token 整个主题拒载
 }
 ```
@@ -80,9 +93,19 @@ themes/<name>/            # 公开主题；本地私用放 themes-private/<name>
 > `composer.placeholder`→`--dream-composer-placeholder` 生成为该主题的 token（手写同名 token 优先）；
 > `stickers` 走 manifest 由运行时渲染（文本一律 textContent 注入，带不进任何标记）。
 
+### 2.1 单模式与自适应模式
+
+- 只有 `tokens`：`single` 主题，保持 v1/v2.2 行为。
+- 只有 `modes.light` 或 `modes.dark`：对应单一外观增量覆盖。
+- 同时包含 `modes.light` 与 `modes.dark`：`adaptive` 主题。
+- `modes.*.tokens` 是增量覆盖，不需要重复 28 个必需 token；继承顺序是结构默认值 → 基础 `tokens` → 当前模式 tokens。
+- `modes.*.cards`、`modes.*.composer` 与 `modes.*.meta` 同样继承基础字段。
+- 根节点的 `.electron-light` / `.electron-dark` 由 Codex 官方外观设置维护；AutoSkin 只观察并切换变量，不重新应用主题，也不重启应用。
+- `node scripts/injector.mjs --themes` 的 `appearance` 字段会显示 `single`、`light`、`dark` 或 `adaptive`。
+
 ## 3. 28 个 token 逐个说明
 
-取色总原则：从图片里取 1 个主色（hue 基准）、1 个辅助亮色、1 个近黑的深色；页面底色永远接近白（本皮肤是浅色皮肤，`color-scheme: light`）。
+取色总原则：从图片里取 1 个主色（hue 基准）、1 个辅助亮色、1 个近黑的深色。浅色模式使用近白表面；深色模式使用同色相的低明度表面。不要在 adaptive 主题的基础层强制单一 `color-scheme`。
 
 ### 3.1 全局色（4 个）
 
@@ -153,6 +176,9 @@ themes/<name>/            # 公开主题；本地私用放 themes-private/<name>
 | `--dream-card-native-icon-1..4` | 对应位置原生图标的 visibility（v1.2；`cards.icons` 命中时生成 `hidden`） | `visible` |
 | `--dream-card-icon-color` | 定制图标的颜色（画在渐变圆徽章上） | `#fff` |
 | `--dream-card-alpha` | 卡片底色透明度（两种版式共用；卡片带 backdrop blur 保证可读） | `.93` |
+| `--dream-card-blur` / `--dream-card-saturation` | 建议卡玻璃模糊半径与饱和度；建议按模式分别覆盖 | `15px` / `1` |
+| `--dream-fullscreen-inset` / `--dream-fullscreen-inset-narrow` | 全屏画布到主区域边缘的常规/窄屏间距 | `14px 16px 16px` / `10px 10px 12px` |
+| `--dream-fullscreen-radius` | 全屏画布圆角 | `28px` |
 | `--dream-composer-placeholder` | 首页输入框占位文案（CSS 字符串） | 原生文案 |
 | `--dream-card-frame` | 卡片内细线装饰框颜色 | `rgba(226,158,196,.55)` |
 | `--dream-card-ornament` | 卡片四角小花饰 + 底部菱形饰点颜色 | `var(--dream-pink)` |
@@ -160,6 +186,21 @@ themes/<name>/            # 公开主题；本地私用放 themes-private/<name>
 | `--dream-sticker-ink` | 贴纸文字/玫瑰线稿主色 | `var(--dream-purple)` |
 | `--dream-sticker-bubble-top` / `--dream-sticker-bubble-right` | 气泡位置（相对主区域） | `19%` / `19%` |
 | `--dream-sticker-board-top` / `--dream-sticker-board-right` / `--dream-sticker-board-width` | 推广牌位置与宽度 | `29%` / `2.6%` / `186px` |
+
+### 3.8 v2.3 原生语义表面 token
+
+adaptive 主题应优先提供这些 token，避免在 `extra.css` 中重复修补设置页和弹窗：
+
+| token 组 | 用途 |
+|---|---|
+| `--dream-native-text-primary/secondary/tertiary` | 原生主要、次要、三级文字 |
+| `--dream-native-link` | 链接与可交互强调文字；不要覆盖危险操作语义 |
+| `--dream-native-sidebar-bg` / `--dream-native-main-bg` | 侧栏与主表面 |
+| `--dream-native-elevated-bg` / `--dream-native-input-bg` | 弹窗、菜单、设置卡、输入与控制表面 |
+| `--dream-native-header-bg` / `--dream-native-hover-bg` | 标题栏与悬停态 |
+| `--dream-native-border` / `--dream-native-border-strong` | 常规与强调边框 |
+
+结构层会给设置路由、dialog 和 menu/listbox 添加稳定的 `dream-*` 标记。主题特例仍可使用 `extra.css`，但应避免哈希 class、语言相关 aria 文案、深层 DOM 链和全局 `* { color }`。
 
 ## 4. crop 调参：size/position 的语义与迭代流程
 

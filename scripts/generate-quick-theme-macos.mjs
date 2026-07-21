@@ -271,10 +271,13 @@ async function installTheme({ image, name, themesRoot, reservedRoot, manifest, a
     throw new Error(`主题 '${name}' 已存在且不是 quick-theme 生成的，不会覆盖；请换一个 --name`);
   }
   await fs.mkdir(themesRoot, { recursive: true });
-  const next = path.join(themesRoot, `.${name}.next-${process.pid}`);
-  const previous = path.join(themesRoot, `.${name}.previous-${process.pid}`);
-  await fs.rm(next, { recursive: true, force: true });
-  await fs.rm(previous, { recursive: true, force: true });
+  const stamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
+  const stagingRoot = path.join(path.dirname(themesRoot), "theme-staging");
+  const archiveRoot = path.join(path.dirname(themesRoot), "themes-archive");
+  const next = path.join(stagingRoot, `${name}-${stamp}-${process.pid}`);
+  const previous = path.join(archiveRoot, `${name}-${stamp}-${process.pid}`);
+  await fs.mkdir(stagingRoot, { recursive: true });
+  await fs.mkdir(archiveRoot, { recursive: true });
   await fs.mkdir(next);
   try {
     await fs.copyFile(image, path.join(next, artFile));
@@ -286,11 +289,11 @@ async function installTheme({ image, name, themesRoot, reservedRoot, manifest, a
       if (existing) await fs.rename(previous, themeDirectory).catch(() => {});
       throw error;
     }
-    await fs.rm(previous, { recursive: true, force: true });
   } catch (error) {
-    await fs.rm(next, { recursive: true, force: true });
+    console.error(`主题暂存目录已保留供检查：${next}`);
     throw error;
   }
+  if (existing) console.error(`旧主题已归档，可恢复：${previous}`);
   return themeDirectory;
 }
 
@@ -310,12 +313,14 @@ const width = Number(/pixelWidth:\s*(\d+)/.exec(info)?.[1]);
 const height = Number(/pixelHeight:\s*(\d+)/.exec(info)?.[1]);
 const temporary = await fs.mkdtemp(path.join(os.tmpdir(), "codex-autoskin-theme-"));
 let analysis;
+let sample;
 try {
-  const sample = path.join(temporary, "sample.bmp");
+  sample = path.join(temporary, "sample.bmp");
   runSips(["-z", "64", "64", "-s", "format", "bmp", image, "--out", sample]);
   analysis = analyzePixels(readBmpPixels(await fs.readFile(sample)));
 } finally {
-  await fs.rm(temporary, { recursive: true, force: true });
+  if (sample) await fs.unlink(sample).catch(() => {});
+  await fs.rmdir(temporary).catch(() => {});
 }
 
 const title = titleFromName(name);

@@ -7,7 +7,7 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-0078d4)
 ![Node](https://img.shields.io/badge/node-%E2%89%A5%2020-339933)
-![Release](https://img.shields.io/github/v/release/Finderchangchang/codex-autoskin)
+![Version](https://img.shields.io/badge/version-2.3.0-7c3aed)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 2 分で反映 · 公式ファイルは一切変更しない · コマンド 1 つで復元 · Windows & macOS
@@ -19,6 +19,12 @@
 </div>
 
 ---
+
+> **派生 Fork に関する通知：**この公開 Fork は
+> [@Meteor21c](https://github.com/Meteor21c) が保守し、元の
+> [Finderchangchang/codex-autoskin](https://github.com/Finderchangchang/codex-autoskin)
+> の Git 履歴と MIT 帰属表示を維持しています。出所、変更、AI 支援、素材権利、
+> 商標の詳細は [NOTICE.md](NOTICE.md) を参照してください。
 
 ## 🎬 実際のデモ
 
@@ -43,7 +49,7 @@ Codex が自分でクローン・インストールし、画像からテーマ�
 下記の一文を、お気に入りの画像（横長・被写体は右寄せ・文字/透かしなし）とともに Codex に送るだけ：
 
 ```text
-この Codex スキンエンジンをインストールして: https://github.com/Finderchangchang/codex-autoskin 、そのあと添付した画像でテーマを生成してすぐ適用して
+この Codex スキンエンジンをインストールして: https://github.com/Meteor21c/codex-autoskin 、そのあと添付した画像でテーマを生成してすぐ適用して
 ```
 
 あとは全自動。画像がなくても内蔵テーマで先に点灯し、あとから追加できます。AI を使いたくない場合は、下のプラットフォーム別の手動手順へ。
@@ -72,16 +78,16 @@ Codex が自分でクローン・インストールし、画像からテーマ�
 - 📁 **テーマはフォルダ** — `theme.json` 1 つ + 画像 1 枚でテーマ 1 つ。追加・削除にコード変更は不要
 - 🤖 **AI による仕上げ（任意）** — リポジトリを Codex / Claude に渡し、[THEME-SPEC.md](THEME-SPEC.md) に沿ってトリミング・文言・ステッカーを深く調整
 - 🔒 **安全で可逆** — CDP 注入はループバックのみ。`WindowsApps`・アプリバンドル・`app.asar` には一切触れず、ログイン/セッションは維持。コマンド 1 つで復元
-- 🛡 **実戦で鍛えた常駐監視** — デュアルスタックのポート探索、クラッシュのデバウンス + サーキットブレーカー、装飾レイヤーのヒットテスト。Windows は Startup watcher、macOS は LaunchAgent で、Codex 再起動後もスキンを自動復旧
+- 🛡 **同意優先の常駐監視** — デュアルスタック探索、デバウンス、サーキットブレーカー、ヒットテスト。Windows Startup watcher / macOS LaunchAgent は CDP が既に利用可能な場合のみ injector を修復し、同意なく Codex を再起動しません
 
 ## 🚀 クイックスタート
 
 ### Windows：2 つのコマンド
 
-前提：Windows 10/11、Microsoft Store 版 Codex（一度起動・ログイン済み）、[Node.js ≥ 20](https://nodejs.org/ja)。
+前提：Windows 10/11、Microsoft Store 版 Codex（一度起動・ログイン済み）。インストーラーは Codex 内蔵の互換 Node.js を優先し、利用できない場合のみシステムの [Node.js ≥ 20](https://nodejs.org/ja) を使用します。
 
 ```powershell
-git clone https://github.com/Finderchangchang/codex-autoskin.git   # または Download ZIP で展開
+git clone https://github.com/Meteor21c/codex-autoskin.git   # または Download ZIP で展開
 cd codex-autoskin
 
 .\quickstart.ps1                              # ① インストール & 起動 — Codex が内蔵テーマで点灯
@@ -174,7 +180,7 @@ scripts/restore-dream-skin.sh                            # macOS：公式の見�
 - いかなる公式ファイルやアプリバンドルも置換・改変・再署名しません。ログイン / セッション / プラグインはそのまま
 - プラットフォーム別の `restore-dream-skin` スクリプトが注入内容をその場で除去。完全アンインストールは Windows で `-Uninstall -RestoreBaseTheme`、macOS で `--uninstall --restore-base-theme`（繰り返し実行可）
 - 実行時の状態はすべて `%LOCALAPPDATA%\CodexDreamSkin` / `~/Library/Application Support/CodexDreamSkin` に置かれ、削除すれば痕跡は残りません
-- 隠れた watcher が Codex 通常再起動後にスキンを自動復旧（デバウンス + 頻度制限 + 失敗クールダウンで、アプリと衝突しない）。macOS の LaunchAgent はインストール前に開いていた Codex を中断しません
+- 隠れた watcher は Codex が CDP を公開済みの場合にのみ injector を修復し、開いているアプリを終了・再起動しません。未適用の実行中インスタンスでは、起動エントリが再起動前に確認します
 - デスクトップペット等の補助レンダラーには注入せず、透明を維持します
 
 > スクリプト名や内部識別子は `dream` プレフィックスのまま——デフォルトのスタイルパック名であり、初代へのオマージュです。
@@ -230,10 +236,10 @@ CDP 注入で Codex を着せ替えるという発想の初代（当時は **Dre
 
 ## ⚠️ 免責事項
 
-- 装飾目的のコミュニティプロジェクトであり、**OpenAI とは無関係**です。Codex および関連する商標は各権利者に帰属します。
+- 装飾目的のコミュニティプロジェクトであり、**OpenAI との提携・承認関係はありません**。Codex および関連商標は各権利者に帰属し、利用時は最新の [OpenAI ブランドガイドライン](https://openai.com/brand/) に従ってください。
 - Codex デスクトップの更新で内部構造が変わり、再対応が必要になる場合があります（エンジンはセマンティックなセレクタで特定するため、小さな更新は通常そのまま動きます）。
 - 自作テーマの素材の著作権・肖像権は各自の責任です。他人の肖像を使ってテーマを作成し公開・配布しないでください。個人テーマは gitignore 済みの `themes-private/` に置いてください。
 
 ## 📄 ライセンス
 
-[MIT](LICENSE) © Vikicc
+[MIT](LICENSE) © 2026 Vikicc（上流の著作物）。変更版は [@Meteor21c](https://github.com/Meteor21c) が保守し、適用可能な範囲で同じライセンスの下に提供します。完全な帰属とライセンス境界は [NOTICE.md](NOTICE.md) を参照してください。
